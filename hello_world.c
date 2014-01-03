@@ -9,11 +9,15 @@
  */
 
 #include "uart.h"
+#include "console.h"
 
 int hello_world (int argc, char * const argv[])
 {
 
 	uart_init();
+
+	console_prompt();
+
 
 	while(1)
 	{
