@@ -1,4 +1,4 @@
-SOURCES=hello_world.c
+SOURCES=hello_world.c uart.c
 CC=arm-linux-gnueabihf-gcc
 ARMLD=arm-linux-gnueabihf-ld
 OBJCPY=arm-linux-gnueabihf-objcopy
@@ -15,7 +15,10 @@ $(EXECUTABLE): $(OBJECTS)
 	$(OBJCPY) -O binary $(EXECUTABLE) $(EXEBIN)
 
 clean: 
-	rm -f $(EXECUTABLE) $(OBJECTS) $(EXEBIN) *.su
+	rm -f $(OBJECTS) *.su
+
+mrproper: clean
+	rm $(EXECUTABLE) $(EXEBIN)
 
 send:
 	scripts/send_image $(EXEBIN) 0x50000000
