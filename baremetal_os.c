@@ -11,10 +11,14 @@
 #include "uart.h"
 #include "console.h"
 
-int hello_world (int argc, char * const argv[])
+int baremetal_os (int argc, char * const argv[])
 {
 
 	uart_init();
+
+	console_print("\r\n");
+
+	console_init();
 
 	console_prompt();
 

@@ -1,19 +1,34 @@
 #include "uart.h"
 #include "console.h"
 
+static char buffer[128]; 
+static int pos;
+
+void console_init(void)
+{
+    pos = 0;
+}
+
 void console_main(void)
 {
     int i = uart_getc();
     if(i != -1)
     {
-	if(i == 13)
+	if(i == 13) // enter
 	{
-	    //uart_putc(10);
+	    console_print("\r\n");
+	    buffer[pos] = '\0';
+	    console_print_hexa(pos);
+	    pos = 0;
+	    console_print(buffer);
 	    console_print("\r\n");
 	    console_prompt();
 	}
 	else
+	{
+	    buffer[pos++] = (char)i;
 	    uart_putc((char)i);
+	}
     }
 
 }
