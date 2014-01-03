@@ -39,9 +39,7 @@ static void console_run(char * cmd)
 	{
 	    case DEFAULT:
 		if(console_streq(cmd, "hexa"))
-		{
-		    mode = HEXA;
-		}
+		  mode = HEXA;
 		else
 		{
 		    console_print("Unknown command : ");
@@ -68,7 +66,6 @@ static void console_run(char * cmd)
 	    default:
 		break;
 	}
-
     pos = 0;
 }
 
@@ -101,16 +98,12 @@ void console_print_hexa(char c)
     console_print(out);
 }
 
-/* Retourne 1 si str et str2 sont égales, 0 sinon */
 int console_streq(char * str, char* str2)
 {
     while (*str && *str2)
     {
 	if(*(str++) != *(str2++))
-	{
 	    return 0;	    
-	}
     }
-
     return *str == *str2;
 }
