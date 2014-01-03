@@ -21,11 +21,7 @@ int hello_world (int argc, char * const argv[])
 
 	while(1)
 	{
-	    int i = uart_getc();
-	    if(i != -1)
-	    {
-		uart_putc((char)i);
-	    }
+	    console_main();
 	}
 
 	return 0;

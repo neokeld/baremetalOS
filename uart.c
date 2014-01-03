@@ -3,7 +3,8 @@
 #define UART0 0x01C28000
 #define LSR 5
 #define DR 0x1
-#define FCR 2
+#define FCR (1 << 1)
+#define THRE (1 << 5)
 
 int i;
 volatile int * uart;
@@ -18,6 +19,7 @@ void uart_init(void)
 
 void uart_putc(char c)
 {
+    while(!((*uart_lsr) & THRE));
     *uart = c;
 }
 

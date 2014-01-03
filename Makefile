@@ -1,4 +1,4 @@
-SOURCES=hello_world.c uart.c
+SOURCES=hello_world.c uart.c console.c
 CC=arm-linux-gnueabihf-gcc
 ARMLD=arm-linux-gnueabihf-ld
 OBJCPY=arm-linux-gnueabihf-objcopy
