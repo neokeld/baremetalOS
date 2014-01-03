@@ -1,12 +1,5 @@
 #include "uart.h"
 
-#define UART0 0x01C28000
-#define LSR 5
-#define DR 0x1
-#define FCR (1 << 1)
-#define THRE (1 << 5)
-
-int i;
 volatile int * uart;
 volatile int * uart_lsr;
 
