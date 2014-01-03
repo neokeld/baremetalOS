@@ -11,4 +11,6 @@ void console_prompt(void);
 
 void console_print_hexa(char c);
 
+int console_streq(char* str, char* str2);
+
 #endif

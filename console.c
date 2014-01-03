@@ -3,10 +3,14 @@
 
 static char buffer[128]; 
 static int pos;
+static enum mode_t {DEFAULT, HEXA, NB_MODES} mode;
+
+static void console_run(char * cmd);
 
 void console_init(void)
 {
     pos = 0;
+    mode = DEFAULT;
 }
 
 void console_main(void)
@@ -16,13 +20,8 @@ void console_main(void)
     {
 	if(i == 13) // enter
 	{
-	    console_print("\r\n");
 	    buffer[pos] = '\0';
-	    console_print_hexa(pos);
-	    pos = 0;
-	    console_print(buffer);
-	    console_print("\r\n");
-	    console_prompt();
+	    console_run(buffer);
 	}
 	else
 	{
@@ -31,6 +30,46 @@ void console_main(void)
 	}
     }
 
+}
+
+static void console_run(char * cmd)
+{
+	console_print("\r\n");
+	switch (mode)
+	{
+	    case DEFAULT:
+		if(console_streq(cmd, "hexa"))
+		{
+		    mode = HEXA;
+		}
+		else
+		{
+		    console_print("Unknown command : ");
+		    console_print(cmd);
+		    console_print("\r\n");
+		    console_prompt();
+		}
+		break;
+	    case HEXA:
+		if(console_streq(cmd, "exit"))
+		    mode = DEFAULT;
+		else
+		{
+		    while (*cmd)
+		    {
+			console_print_hexa(*cmd++);
+			console_print(" ");
+		    }
+		    console_print("\r\n");
+		}
+		if(mode == DEFAULT)
+		    console_prompt();
+		break;
+	    default:
+		break;
+	}
+
+    pos = 0;
 }
 
 void console_print(char * str)
@@ -60,4 +99,18 @@ void console_print_hexa(char c)
     }
     out[4] = '\0';
     console_print(out);
+}
+
+/* Retourne 1 si str et str2 sont égales, 0 sinon */
+int console_streq(char * str, char* str2)
+{
+    while (*str && *str2)
+    {
+	if(*(str++) != *(str2++))
+	{
+	    return 0;	    
+	}
+    }
+
+    return *str == *str2;
 }
