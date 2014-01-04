@@ -1,4 +1,4 @@
-SOURCES=baremetal_os.c uart.c console.c
+SOURCES=baremetal_os.c uart.c console.c gpio.c
 CC=arm-linux-gnueabihf-gcc
 ARMLD=arm-linux-gnueabihf-ld
 OBJCPY=arm-linux-gnueabihf-objcopy
