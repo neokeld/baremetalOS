@@ -13,7 +13,8 @@
 #include "uart.h"
 #include "gpio.h"
 #include "console.h"
-#include "led.h"
+//#include "led.h"
+#include "memory.h"
 
 /*Entry point*/
 int baremetal_os (int argc, char * const argv[])
@@ -30,7 +31,7 @@ int baremetal_os (int argc, char * const argv[])
 
 
 	uart_init();
-	led_init();
+	//	led_init();
 	console_print("\r\n");
 	console_init();
 
@@ -45,7 +46,7 @@ int baremetal_os (int argc, char * const argv[])
 	console_print("\r\n");
 */
 	
-	gpio_init();
+	//gpio_init();
 /*
 	console_print_hexa((char) *gpio); console_print("--");
 	console_print_hexa((char) *gpio_cfg0); console_print("--");
@@ -75,12 +76,14 @@ int baremetal_os (int argc, char * const argv[])
 	//led_cfg_set(0);
 	//led_dat_set(1);
 
-	console_prompt();
+      	console_prompt();
 
-	while(1)
+	/*while(1)
 	{
 	    console_print_hexa(gpio_read());
 	  console_main();
-	}
+	  }*/
+
+	memprobe();
 	return 0;
 }
