@@ -10,7 +10,7 @@ void console_print(char * str);
 /*Print prompt*/
 void console_prompt(void);
 /*Print hexa code*/
-void console_print_hexa(char c);
+void console_print_hexa(unsigned int c);
 /*Returns 0 if str = str2, else 1*/
 int console_streq(char* str, char* str2);
 

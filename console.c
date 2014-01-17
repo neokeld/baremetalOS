@@ -80,13 +80,13 @@ void console_prompt(void)
     console_print("bOS> ");
 }
 
-void console_print_hexa(char c)
+void console_print_hexa(unsigned int c)
 {
-    char out[5];
+    char out[11];
     int i,p;
     out[0] = '0';
     out[1] = 'x';
-    for (i=0, p=3; i<2; i++, p--)
+    for (i=0, p=9; i<8; i++, p--)
     {
 	if(c%16 <10)
 	    out[p] = c%16 + 48;
@@ -94,7 +94,7 @@ void console_print_hexa(char c)
 	    out[p] = c%16 + 55;
 	c /= 16;
     }
-    out[4] = '\0';
+    out[10] = '\0';
     console_print(out);
 }
 

@@ -4,24 +4,24 @@
 /*GPIO address*/
 #define GPIO 0x01C20800
 /*Port I Configure Register 0 offset
- * Responsible of Port I0 to Port I7*/
+ * Responsible of Port I0 to Port I7 - 120*/
 #define PI_CFG0 0x120
 /*Port I Configure Register 1 offset
- * Responsible of Port I8 to Port I15*/
+ * Responsible of Port I8 to Port I15 - 124*/
 #define PI_CFG1 0x124
 /*Position of the first bit of PI0*/
-#define PI0 0x0
+#define PI0 0
 /*Position of the first bit of PI1*/
-#define PI1 0x4
+#define PI1 4
 /*Position of the first bit of PI2*/
-#define PI2 0x8
+#define PI2 8
 /*Position of the first bit of PI3*/
-#define PI3 0x12
+#define PI3 12
 /*Position of the first bit of PI10*/
-#define PI10 0x8
+#define PI10 8
 /*Position of the first bit of PI11*/
-#define PI11 0x12
-/* Port I Data Register offset*/
+#define PI11 12
+/* Port I Data Register offset - 0x130*/
 #define PI_DAT 0x130
 
 /*Initialize GPIO useful registers*/
@@ -35,5 +35,5 @@ void gpio_output_set(int pin);
 void gpio_activate(int pin);
 /*Change the pin state to 0V*/
 void gpio_desactivate(int pin);
-
+int gpio_read(void);
 #endif
