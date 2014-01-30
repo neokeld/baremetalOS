@@ -1,0 +1,164 @@
+\documentclass[frenchb]{article}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage[francais]{babel}
+\usepackage{fancyhdr}
+\usepackage{float}
+\usepackage{lastpage}
+\usepackage{fancyvrb} 
+\usepackage{graphicx}
+\usepackage{hyperref}
+\pagestyle{fancy}
+\lhead{Projet Nmap}
+\cfoot{M.BRULATOUT - A.DUFORAT - L.L\'EV\^EQUE - K.MALLOUKY}
+\rfoot{\thepage}
+\renewcommand{\footrulewidth}{0.5pt}
+\begin{document}
+\topmargin        = 0.mm
+\headheight       = 12.1638pt
+\evensidemargin   = 10.mm
+%\oddsidemargin    = 10.mm
+%\textheight       = 215.mm
+%\textwidth        = 145.mm
+\begin{titlepage}
+  \begin{center}
+    \textsc{\LARGE Rapport du projet sécurité : Nmap}\\[0.5cm]
+    \textsc{\Large Mathias BRULATOUT\\ Arnaud DUFORAT\\ Louis L\'EV\^EQUE\\ Kamal MALLOUKY}\\[1.5cm]
+    \textsc{\Large \today }\\[1.5cm]
+    \begin{figure}[h!]
+      \center
+      \includegraphics[width=8cm]{enseirb.png}
+    \end{figure}
+    \vspace{1cm}
+    \textsc{\Large Responsables Pédagogiques : Mathieu BLANC \\ \hspace{7cm} Pierre LALET}
+  \end{center}  
+\end{titlepage}
+%\tableofcontents
+\section*{Introduction}
+Dans le cadre du projet RE-315 Sécurité des Réseaux, il a été choisi de développer un script Nmap. Nmap est un outil libre de détection de ports ouverts et d'identification de services entre autres. Le script implémenté se base sur une des suggestions de script Nmap\footnote{https://secwiki.org/w/Nmap/Script\_Ideas}, à savoir \textsc{SSH Key Acceptance Checker}. L'idée est de tenter une authentification SSH sur différentes machines avec différentes clés publiques SSH.
+
+Ce rapport explique les démarches que nous avons adoptées pour mener à bien ce projet, les choix que nous avons fait et les raisons pour lesquelles nous les avons faits.
+
+Tout d'abord, les objectifs du projet seront présentés, afin d'enchaîner sur le travail et les choix effectués en démontrant leur intérêt pour résoudre notre problème efficacement puis une des applications possibles du script.
+\clearpage
+\section{Objectifs}
+\subsection{Script Nmap}
+     Nmap dispose d'un grand nombre de scripts localisés  dans le répértoire \textsf{/usr/share/nmap/scripts}, qui sont la base de toutes les fonctionnalités offertes par Nmap. Ils  sont écrits en Lua, langage de scripts libre, réflexif et impératif.
+     En outre Nmap offre la possiblité d'écrire ses propres scripts, des scripts pour automatiser une grande variété de tâches de mise en réseau, et ce grâce à son moteur de script NSE\footnote{Nmap Scripting Engine}.
+ Nmap classifie les scripts en plusieurs catégories dont : 
+
+ \begin{description}
+ \item[auth :] scripts recherchant des informations d'identification.
+ \item[discovery :] scripts de découverte active du réseau.
+ \item[exploit :] scripts visant à exploiter des vulnérabilités sur un hôte distant.
+ \item[fuzzer :] scripts utilisés pour envoyer des requêtes aléatoires à un serveur pour en exposer les potentiels bugs et vulnérabilités.
+\end{description}
+
+\subsubsection*{Format de script Nmap}
+
+Les scripts Nmap sont structurés de façon à contenir plusieurs champs descriptifs, des méthodes conditionnant l'exécution du script, et une méthode principale qui représente le coeur du script.
+
+Ci-dessous la liste des champs descriptifs :
+\begin{description}
+\item[description :] contient une brève description des fonctionnalités du script.
+\item[categories :]  définit la ou les catégories auxquelles appartient le script.
+\item[author :] contient le nom des développeurs du script
+\item[licence :] détérminer la licence sous laquelle est le script.
+\item[dependencies :] Ensemble des dépendances ainsi les scripts mentionnés doivent etre executés avant le script en question.
+\end{description}
+
+Les scripts Nmap possèdent une méthode assimilable au \textsf{main} en C, appellée \textsf{action}. Les scripts Nmap utilisent des règles pour déterminer s'il faut exécuter le script sur une cible ou non. Ces règles sont des fonctions booléennes. La fonction \textsf{action} n'est executée que si les règles sont vraies. Il en existe quatre différentes :
+
+\begin{description}
+\item [prerule() :] lancée une fois avant toute action du script, doit retourner vrai.
+\item [hostrule(host) :] lancée avant chaque scan d'hôte. Permet de savoir s'il est atteignable ou non
+\item [portrule(host,port) :] de même que hostrule, mais permet de savoir si les ports d'un hôte donné sont atteignables.
+\item [postrule() :] lancée une fois après toute action du script, doit retourner vrai
+\end{description}
+
+L'appel de scripts Nmap créés se fait via la commande \textsf{Nmap --script HelloWorld.nse} (pour un script \textsf{HelloWorld.nse}). Pour nous familiriariser avec le Lua et le NSE, un script HelloWorld a été créé, permettant d'illustrer la structure d'un script Nmap, dont voici le contenu :
+\begin{verbatim}
+local nmap = require "nmap" 
+local table = require "table" 
+
+description = [[Script Hello World]] 
+author = "Arnauld Duforat,Louis Lévèque,
+          Mathias Brulatout,Kamal Mallouky" 
+license = "GPL 2.0" 
+categories = {"default,safe"} 
+
+prerule = function()
+  return true
+end
+
+postrule = function() 
+  return true 
+end 
+
+action = function() 
+  local out = {} 
+  table.insert(out, string.format("Hello World"))
+  return stdnse.format_output(true, out)  
+end
+\end{verbatim}
+
+\subsection{Authentification par clés SSH}
+L'authentification par clés SSH se base sur la cryptographie asymétrique (ou à clé publique) qui repose sur l'utilisation d'une clé publique, diffusée, et d'une clé privée. La publique sert à chiffrer, et la privée sert à déchiffrer. Seul le véritable destinaire, détenteur de la clé privée est donc capable de comprendre le message envoyé, même s'il n'est pas le seul à le recevoir.
+
+SSH met en place ce mécanise via la commande \textsf{ssh-keygen} générant une clé privée (\textsf{$\sim$/.ssh/id\_rsa}) et une clé publique (\textsf{$\sim$/.ssh/id\_rsa.pub}). Il suffit de placer la clé publique sur la machine distante (dans \textsf{$\sim$/.ssh/authorized\_keys}) pour permettre lui permettre d'être reconnue auprès de la machine locale.
+
+Cette authentification est une alternative à l'authentification par mot de passe, pour des raisons de sécurité, et de confort. A chaque session SSH, il n'est pas nécessaire de rentrer son mot de passe, sur une machine potentiellement vulnérable, non mise à jour, d'où le mot de passe pourrait fuir. En contrepartie, il faut limiter les droits du fichier \textsf{$\sim$/.ssh/id\_rsa} contenant la clé privée, en veillant à ne donner aucun droit aux autres utilisateurs, puisque la sécurité de ce système repose sur la non-divulgation de cette clé.
+
+Avec un grand nombre de clés publique, il est intéressant de toutes les essayer sur des machines différentes. Une d'elle pourrait nous identifier et des droits non-légitimes seraient donc acquis, ouvrant la voie à de potentielles attaques et exploitations de failles.
+
+\clearpage
+\section{R\'ealisation}
+Cette partie pr\'esente notre d\'emarche de cr\'eation du script Nmap et les diff\'erents probl\`emes rencontr\'es.
+
+Dans un premier temps nous nous sommes pench\'es sur le code des scripts Nmap relatifs à SSH. Malheureusement nous avons constat\'e que les fonctions d'utilisation du protocole SSH n\'ecessaires aux scripts existants \'etaient r\'eimpl\'ement\'ees en Lua dans le code de Nmap.
+
+Puisque les fonctions d'authentification par clefs publiques n'\'etait pas disponibles, nous avons choisi d'employer la biblioth\`eque C \textsf{libssh2} plutôt que de rentrer dans la complexit\'e du protocole SSH.
+
+Nos recherches se sont alors concentr\'ees sur les techniques permettant d'appeler des fonctions d'une biblioth\`eque C depuis du code Lua. Apr\`es avoir essay\'e de comprendre comment utiliser le g\'en\'erateur de Wrapper SWIG ou \textsf{Simplified Wrapper and Interface Generator} nous nous sommes rendus compte qu'il n'\'etait pas possible d'appeler des fonctions d'une biblioth\`eque C externe directement depuis du Lua. Nous avons donc d\'ecid\'e d'utiliser les primitives de la biblioth\`eque C Lua pour "pousser" les fonctionnalit\'es de la Biblioth\`eque \textsf{libssh2} dans la machine virtuelle Lua.
+
+Pour cela il nous a \'et\'e n\'ecessaire d'\'ecrire des fonctions d'encapsulation capable d'extraire les arguments d'un \'etat Lua. Ces fonctions doivent être int\'egr\'es à Nmap.
+
+La \textsf{libssh2} n'\'etait pas import\'ee par Nmap. En effet, historiquement cette biblioth\`eque n'\'etait pas thread-safe, ce qui a pouss\'e les d\'eveloppeurs Nmap à r\'eimpl\'ementer ses fonctions. Mais le probl\`eme a depuis \'et\'e r\'esolu (en juin 2009). Nous avons donc d\'ecid\'e d'ajouter une d\'ependance sur \textsf{libssh2} à Nmap.
+
+Puisque Nmap utilise \textsf{autoconf}(dont le processus d'exécution est illustré Figure 1) pour v\'erifier la pr\'esence de ses d\'ependances, nous avons dû nous familiariser avec son fonctionnement et sa syntaxe.
+
+Un fichier de script nomm\'e \textsf{configure.ac} d\'ecrit dans un langage compris par \textsf{autoconf} les proc\'edures de v\'erification n\'ecessaires à la bonne construction du logiciel. À partir de ce fichier et du fichier \textsf{Makefile.in} sera g\'en\'er\'e le script \textsf{configure} qui est capable de v\'erifier la pr\'esence des diff\'erentes d\'ependances et de g\'en\'erer un \textsf{Makefile} adapt\'e au syst\`eme et à l'architecture cible.
+Les modifications qu'il nous a fallu apporter à ces deux fichiers sont les suivantes :
+\begin{itemize}
+    \item ajouter la v\'erification de la pr\'esence de la biblioth\`eque \textsf{libssh2}. Pour cela nous nous sommes inspir\'es de la v\'erification de openssl. La macro \textsf{m4 AC\_CHECK\_LIB} v\'erifie la pr\'esence d'une biblioth\`eque pass\'ee en param\`etre en essayant de compiler un code appelant la fonction, elle aussi pass\'ee en param\`etre, de la biblioth\`eque.
+    \item ajouter le flag d'\'editeur de lien lors de la compilation. Cela se fait par l'interm\'ediaire du fichier \textsf{Makefile.in}.
+\end{itemize}
+
+\begin{figure}[H]
+  \center
+  \includegraphics[width=10cm]{autoconf.png}
+  \caption{Processus d'exécution d'autoconf (wikipédia)}
+  \label{autoconf}
+\end{figure}
+
+Une fois la d\'ependance à \textsf{libssh2} ajout\'ee, nous avons impl\'ement\'e les fonctions à ajouter à la machine virtuelle Lua. Elles se trouvent dans nse\_main.cc contenant la fonction principale de la biblioth\`eque nse de Nmap.
+Ces m\'ethodes doivent respecter un prototype particulier pour pouvoir être ajout\'ees à la machine virtuelle Lua. Elles doivent prendre en param\`etre un pointeur de lua\_State et retourner un entier. La structure \textsf{lua\_State} contient une pile des param\`etres pass\'e à la fonction Lua. En haut de la pile se trouve le nombre des arguments (accessible grâce à \textsf{lua\_gettop}). Les arguments peuvent être r\'ecup\'er\'es avec lua\_tostring. Pour retourner une valeur de la fonction C++, nous avons besoin lua\_pushnumber.
+
+Une probl\`ematique du d\'eveloppement est qu'il n'est pas possible de passer une structure C++ à la machine virtuelle Lua. On ne pouvait manipuler en arguments et en valeur de retour que des entiers, des flottants et des chaines de caract\`eres. De plus, les macros ne peuvent pas être ajout\'ees à la machine virtuelle. Ainsi, il \'etait impossible d'ajouter les m\'ethodes de la \textsf{libssh2} à la machine virtuelle Lua directement. Nous avons donc dû encapsuler les op\'erations n\'ecessaires à une connection ssh dans deux m\'ethodes :
+\begin{itemize}
+    \item \textsf{session\_init}, responsable d'initialiser \textsf{libssh2}, de cr\'eer un socket, d'initialiser une session SSH, et de faire le handshake SSH.
+    \item \textsf{userauth\_publickey}, qui teste de s'authentifier avec une cl\'e publique d'un utilisateur donn\'e
+\end{itemize}
+Ces m\'ethodes sont utilis\'ees dans un script Nmap en Lua que nous avons ajout\'e dans la biblioth\`eque de scripts NSE : \textsf{ssh2-key-acceptance-checker.nse}. 
+La premi\`ere m\'ethode fonctionne. La deuxi\`eme m\'ethode retourne syst\`ematiquement une erreur \textsf{LIBSSH2\_ERROR\_PUBLICKEY\_UNVERIFIED} (-19) et n\'ecessiterait que nous modifions la \textsf{libssh2} pour ajouter des codes de debug et ainsi trouver d'où vient l'erreur.
+
+\clearpage
+\section*{Conclusion}
+
+
+Bien que nous n'ayons pas réussi à faire fonctionner notre script, ce projet a été l'occasion de découvrir diverses technologies. En effet, les scripts Nmap étant développés en Lua nous avons été amenés a nous familiariser avec ce langage de scripts. De plus, puisque notre projet nécessitait d'ajouter à Nmap une dépendance sur la bibliothèque \textsf{libssh2}, il nous a fallu apprendre à utiliser un des outils du système de compilation GNU, \textsf{autoconf}. 
+
+Ce qui a sans doute coûté sa réussite à ce projet sont les problèmes rencontrés tout au long de ce dernier. L'avancement s'est fait par petites étapes débouchant chaque fois sur un nouveau problème dont la résolution nous prenait parfois plusieurs jours. Cependant le sujet et sa problématique étaient plutôt intéressants.
+
+En effet, l'utilisation de clés SSH sur différentes machines automatiquement possède un réel intérêt. En effet, en 2012, une faille a été découverte affectant un grand nombre de matériel BigIP\footnote{https://www.trustmatta.com/advisories/MATTA-2012-002.txt}. Ils contiennent une clé privée autorisant l'accès SSH root à quiconque sur n'importe quel autre matériel BigIP, et la clé publique est disponible.
+\end{document}

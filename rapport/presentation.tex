@@ -1,0 +1,214 @@
+\documentclass{beamer}
+\usepackage[francais]{babel}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{multicol}
+
+\usetheme{Berlin}
+\defbeamertemplate*{headline}{}
+{
+  \begin{beamercolorbox}[ht=2.25ex,dp=3ex,center]{section in head/foot}
+    \insertnavigation{\paperwidth}
+  \end{beamercolorbox}
+}
+ 
+\defbeamertemplate*{footline}{infolines}
+{l
+  \leavevmode%
+  \hbox{%
+  \begin{beamercolorbox}[wd=.5\paperwidth,ht=2.25ex,dp=1ex,center]{title in head/foot}
+    \usebeamerfont{title in head/foot}\insertshorttitle
+  \end{beamercolorbox}%
+  \begin{beamercolorbox}[wd=.5\paperwidth,ht=2.25ex,dp=1ex,right]{date in head/foot}
+    \usebeamerfont{date in head/foot}%\insertshortdate{}\hspace*{2em}
+    ENSEIRB-MATMECA\hspace*{4em}
+    \insertframenumber{} / \inserttotalframenumber\hspace*{4em}
+  \end{beamercolorbox}}
+  \vskip0pt%
+}
+\title{Projet Nmap}
+\author{Mathias Brulatout \and Arnaud Duforat \\ Louis Lévêque \and Kamal Mallouky}
+\institute{Responsables Pédagogiques : \\ Mathieu Blanc \& Pierre Lalet}
+\titlegraphic{\includegraphics[scale=0.16]{enseirb.png}}
+\date{\today}
+\makeatletter
+\newenvironment{withoutheadline}{
+  \setbeamertemplate{headline}[default]
+  \setbeamertemplate{footline}[default]
+  \def\beamer@entrycode{\vspace*{-\headheight}}
+}{}
+\makeatother
+\begin{document}
+\begin{withoutheadline}
+  \begin{frame}
+    \titlepage
+  \end{frame}
+\end{withoutheadline}
+\addtocounter{framenumber}{-1}
+%KAMAL
+\begin{frame}
+  \frametitle{Introduction}
+  \begin{itemize} % copie/colle pour faire une liste avec 3 items.
+  \item Nmap.
+  \item Nmap Scripting Engine.
+  \item Lua.
+  \end{itemize}
+\end{frame}
+
+\AtBeginSection[]
+{
+  \begin{frame}
+    \frametitle{Sommaire}
+    \tableofcontents[currentsection]
+  \end{frame}
+}
+\begin{frame}
+  \frametitle{Sommaire}
+  \tableofcontents
+\end{frame}
+
+
+\section{Script Nmap}
+\subsection{}
+\begin{frame}
+  \frametitle{Scripts Nmap}
+  \begin{itemize}
+    \item champs descriptifs (description/author/dependencies)
+    
+    \item section rules:
+    \begin{itemize}
+      \item prerule()
+      \item hostrule(host)
+      \item portrule(host,port)
+      \item postrule()
+    \end{itemize}
+  \item méthode action()
+  \end{itemize}
+
+\end{frame}
+\begin{frame}
+  \frametitle{Clés SSH}
+  
+    Basé sur la crypto asymétrique
+    \begin{itemize}
+      \item clé publique
+      \item clé privée
+      \item passphrase
+    \end{itemize}
+    SSH garantie:
+    \begin{itemize}
+  \item la confidentialité
+  \item l'intégrité
+  \item l'authentification
+    \end{itemize}
+\end{frame}
+%LOUIS
+
+\section{Réalisation}
+\subsection{ }
+\begin{frame}
+  \frametitle{R\'ealisation}
+  \begin{itemize}
+  \item Utilisation de la librairie libssh2
+  \item SWIG (Simple Wrapper and Interface Generator)
+  \item autoconf
+  \end{itemize}
+\end{frame}
+
+\begin{withoutheadline} 
+\begin{frame}
+\frametitle{Autoconf}
+\begin{figure}
+\includegraphics[width=4.4cm]{acschema.png}
+\caption{Processus d'exécution d'autoconf}
+\end{figure}
+
+\end{frame}
+\end{withoutheadline} 
+\begin{frame}
+\frametitle{Ajout de fonctions C dans la machine Lua}
+ Structure lua\_State \\
+ Fonctions
+ \begin{itemize}
+ \item lua\_tostring
+ \item lua\_pushnumber
+ \end{itemize}
+
+\end{frame}
+
+\section{Difficultés rencontrées}
+\subsection{ }
+
+\begin{frame}
+\frametitle{Difficultés}
+\begin{itemize}
+\item Tentative de création d'un wrapper de C pour Lua
+\item AC\_CHECK\_LIB ne peut pas fonctionner avec les macros
+\item Makefile.in nécessaire pour linkflags
+\end{itemize}
+\end{frame}
+
+\begin{frame}
+\frametitle{Difficultés}
+\begin{itemize}
+ \item lua\_pushcfunction n'a jamais fonctionné
+ \item utilisation de lua\_register
+ \item impossibilité d'ajouter à la machine virtuelle des macros
+ \end{itemize}
+\end{frame}
+\begin{frame}
+\frametitle{Difficultés}
+\begin{itemize}
+\item libssh2\_trace non fonctionnel
+\item libssh2\_session\_last\_error
+\item lecture des codes d'erreur dans le code source
+\item nécessité de patcher la libssh2 pour debug
+\end{itemize}
+\end{frame}
+
+\begin{frame}
+  \frametitle{Des problèmes bénéfiques}
+  \begin{itemize}
+  \item Apprentissage du Lua
+  \item Modifications sur un code source peu documenté 
+  \item Suppression de code inutile dans Nmap 
+  \end{itemize}
+\end{frame}
+
+\begin{frame}
+  \frametitle{Wireshark}
+  \begin{figure}
+    \hspace*{-1cm}
+    \includegraphics[height=0.7\textheight]{wireshirk.png}
+  \end{figure}
+\end{frame}
+
+\section{Big-IP}
+\subsection{ }
+\begin{frame}
+  \frametitle{Equipements Big-IP}
+  Utile pour une archi redondante
+  \begin{itemize}
+  \item Local/Global Traffic Manager
+  \item VPN
+  \item Proxy
+  \item Firewall applicatif
+  \end{itemize}
+\end{frame}
+
+\let\origaddtocontents=\addtocontents
+\def\dontaddtocontents#1#2{}
+\let\addtocontents=\dontaddtocontents
+\section*{Conclusion}
+\let\addtocontents=\origaddtocontents
+
+\begin{frame}
+  \frametitle{Conclusion}
+  \begin{itemize}
+  \item Solution non fonctionnelle
+  \item Prise en main de Nmap et Lua
+  \item \textsf{SSH Key Acceptance checker} a un réel intérêt
+  \end{itemize}
+\end{frame}
+
+\end{document}
