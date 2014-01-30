@@ -1,5 +1,6 @@
 #include "uart.h"
 #include "console.h"
+#include "led.h"
 
 static char buffer[128]; 
 static int pos;
@@ -40,6 +41,12 @@ static void console_run(char * cmd)
 	    case DEFAULT:
 		if(console_streq(cmd, "hexa"))
 		  mode = HEXA;
+		else if (console_streq(cmd, "led"))
+		{
+		  led_cfg_set(1);
+		  led_dat_set(!led_dat_get_state());
+		  console_prompt();
+		}
 		else
 		{
 		    console_print("Unknown command : ");
