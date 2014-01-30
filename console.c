@@ -98,6 +98,28 @@ void console_print_hexa(unsigned int c)
     console_print(out);
 }
 
+void console_print_registers(void){
+  //Affiche l'état des registres
+
+  register unsigned int R13 asm("sp");
+  register unsigned int R14 asm("lr");
+  register unsigned int R15 asm("pc");
+
+
+  console_print("r13 (sp) = ");
+  console_print_hexa("SP");
+  console_print("\r\n");
+
+  console_print("r14 (lr) = ");
+  console_print_hexa("LR");
+  console_print("\r\n");
+  
+  console_print("r15 (pc) = ");
+  console_print_hexa("PC");
+  console_print("\r\n");
+}
+
+
 int console_streq(char * str, char* str2)
 {
     while (*str && *str2)
