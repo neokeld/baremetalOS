@@ -108,9 +108,9 @@ envoi de binaire via kermit
 {\Huge \textbf{FINIR SUR HELLOWORLD EXECUTE}}
 
 \clearpage
-\section{R\'ealisation}
-Cette partie présente les diverses fonctionnalités de notre projet.
-\subsection{UART}
+\section{UART}
+
+{\Large\textbf{Phrase intro}}
 Une fois que nous avons réussi à compiler et exécuter notre propre programme sur la carte, il a fallu développer ce qui allait être la base de l'interface de notre système, la communication série.
 Pour cela il nous faut utiliser un UART (Universal Asynchronous Receiver Transmitter), composant dédié à ce type de communication.
 Puisque l'UART0 est doté d'un brochage séparé et que c'est celui utilisé par la console U-Boot, nous avons décidé de l'utiliser nous aussi.
@@ -148,26 +148,19 @@ L'étape suivante à été naturellement de réaliser l'interface console à pro
 
 
 %\lstinputlisting[caption=Scheduler, style=customc]{../uart.c}
-\subsection{GPIO}
+\section{GPIO}
 
-\subsection{Memory Management}
-
-\clearpage
-\section{Problèmes rencontrés}
-uboot
-GPIO... ?
-MMU/Power Management ?
-
-Incompétence
+\section{Memory Management}
 
 \clearpage
+
 \section*{Conclusion}
 
-Développement le plus bas niveau qu'on ait jamais fait. Sans uboot, ça aurait été du baremetal
-Utilisation du C sans bibliothèque externe
-Utilisation d'UART / GPIO inconnus avant
-Implémentation de malloc/free
-on est des autiste : (int*) + 1 = int* + sizeof(int)
+\noindent Développement le plus bas niveau qu'on ait jamais fait. Sans uboot, ça aurait été du baremetal\\
+Utilisation du C sans bibliothèque externe\\
+Utilisation d'UART / GPIO inconnus avant\\
+Implémentation de malloc/free\\
+on est des autiste : (int*) + 1 = int* + sizeof(int)\\
 
 
 {\Large\textbf{OLDCONCLUSION}}
