@@ -8,9 +8,63 @@
 \usepackage{fancyvrb} 
 \usepackage{graphicx}
 \usepackage{hyperref}
+
+\usepackage{listings}
+
+
+\usepackage{xcolor}
+
+\definecolor{mygreen}{rgb}{0,0.6,0}
+\definecolor{mygray}{rgb}{0.5,0.5,0.5}
+\definecolor{mymauve}{rgb}{0.58,0,0.82}
+
+\lstset{ %
+  backgroundcolor=\color{white},   % cbackground color \usepackage{xcolor}
+  basicstyle=\footnotesize,        % font size
+  breakatwhitespace=false,         % autobreak only at whitespace
+  breaklines=true,                 % sets automatic line breaking
+  captionpos=b,                    % sets the caption-position to bottom
+  commentstyle=\color{mygreen},    % comment style
+  deletekeywords={...},            % delete keywords from the given language
+  escapeinside={\%*}{*)},          % if you want to add LaTeX within your code
+  extendedchars=true,              % lets you use non-ASCII characters; no UTF8
+  frame=single,                    % adds a frame around the code
+  keepspaces=true,                 % keeps spaces, to indent : columns=flexible
+  keywordstyle=\color{blue},       % keyword style
+  language=Octave,                 % the language of the code
+  morekeywords={*,...},            % if you want to add more keywords to the set
+  numbers=left,                    % where to put line number (none, left, right)
+  numbersep=5pt,                   % how far the line-numbers are from the code
+  numberstyle=\tiny\color{mygray}, % the style that is used for the line-numbers
+  rulecolor=\color{white},         % black for rules
+  showspaces=false,                % show spaces, overrides 'showstringspaces'
+  showstringspaces=false,          % underline spaces within strings only
+  showtabs=false,                  % show tabs 
+  stepnumber=1,                    % the step between two line-numbers.
+  stringstyle=\color{mymauve},     % string literal style
+  tabsize=2,                       % sets default tabsize to 2 spaces
+  title=\lstname                   % filename \lstinputlisting; try caption
+}
+
+\lstdefinestyle{customc}{
+  belowcaptionskip=1\baselineskip,
+  breaklines=true,
+  frame=L,
+  xleftmargin=\parindent,
+  language=C,
+  showstringspaces=false,
+  basicstyle=\normalsize\ttfamily,
+  keywordstyle=\bfseries \color{green!40!black},
+  commentstyle=\itshape \color{purple!40!black}, %itshape
+  identifierstyle=\color{blue},
+  stringstyle=\color{orange},
+}
+\lstset{escapechar=@,style=customc}
+
+
 \pagestyle{fancy}
-\lhead{Projet Nmap}
-\cfoot{M.BRULATOUT - A.DUFORAT - L.L\'EV\^EQUE - K.MALLOUKY}
+\lhead{Projet Olimex}
+\cfoot{M.BRULATOUT - A.DUFORAT - L.L\'EV\^EQUE - K.MALLOUKY - N.SARLIN}
 \rfoot{\thepage}
 \renewcommand{\footrulewidth}{0.5pt}
 \begin{document}
@@ -22,143 +76,103 @@
 %\textwidth        = 145.mm
 \begin{titlepage}
   \begin{center}
-    \textsc{\LARGE Rapport du projet sécurité : Nmap}\\[0.5cm]
-    \textsc{\Large Mathias BRULATOUT\\ Arnaud DUFORAT\\ Louis L\'EV\^EQUE\\ Kamal MALLOUKY}\\[1.5cm]
+    \textsc{\LARGE Rapport du projet PR311 : Olimex}\\[0.5cm]
+    \textsc{\Large Mathias BRULATOUT\\ Arnaud DUFORAT\\ Louis L\'EV\^EQUE\\ Kamal MALLOUKY\\ Nicolas SARLIN}\\[1.5cm]
     \textsc{\Large \today }\\[1.5cm]
     \begin{figure}[h!]
       \center
       \includegraphics[width=8cm]{enseirb.png}
     \end{figure}
     \vspace{1cm}
-    \textsc{\Large Responsables Pédagogiques : Mathieu BLANC \\ \hspace{7cm} Pierre LALET}
+    \textsc{\Large Responsable Pédagogique : Aymeric Vincent}
   \end{center}  
 \end{titlepage}
 %\tableofcontents
 \section*{Introduction}
-Dans le cadre du projet RE-315 Sécurité des Réseaux, il a été choisi de développer un script Nmap. Nmap est un outil libre de détection de ports ouverts et d'identification de services entre autres. Le script implémenté se base sur une des suggestions de script Nmap\footnote{https://secwiki.org/w/Nmap/Script\_Ideas}, à savoir \textsc{SSH Key Acceptance Checker}. L'idée est de tenter une authentification SSH sur différentes machines avec différentes clés publiques SSH.
+Dans le cadre du projet PR311 Développement système, il a été choisi de développer sur un Olimex OLinuXino A20. Pour en savoir plus sur la programmation bas niveau, nous avons décidé d'implémenter un pseudo-OS,  plutôt que d'utiliser une plateforme UNIX pour développer quelque chose ayant un intérêt pédagogique bien plus limité.
 
 Ce rapport explique les démarches que nous avons adoptées pour mener à bien ce projet, les choix que nous avons fait et les raisons pour lesquelles nous les avons faits.
 
-Tout d'abord, les objectifs du projet seront présentés, afin d'enchaîner sur le travail et les choix effectués en démontrant leur intérêt pour résoudre notre problème efficacement puis une des applications possibles du script.
+Tout d'abord, l'A20 sera presenté, afin d'enchaîner sur le travail et les choix effectués.
 \clearpage
-\section{Objectifs}
-\subsection{Script Nmap}
-     Nmap dispose d'un grand nombre de scripts localisés  dans le répértoire \textsf{/usr/share/nmap/scripts}, qui sont la base de toutes les fonctionnalités offertes par Nmap. Ils  sont écrits en Lua, langage de scripts libre, réflexif et impératif.
-     En outre Nmap offre la possiblité d'écrire ses propres scripts, des scripts pour automatiser une grande variété de tâches de mise en réseau, et ce grâce à son moteur de script NSE\footnote{Nmap Scripting Engine}.
- Nmap classifie les scripts en plusieurs catégories dont : 
+\section{Présentation de la plateforme}
 
- \begin{description}
- \item[auth :] scripts recherchant des informations d'identification.
- \item[discovery :] scripts de découverte active du réseau.
- \item[exploit :] scripts visant à exploiter des vulnérabilités sur un hôte distant.
- \item[fuzzer :] scripts utilisés pour envoyer des requêtes aléatoires à un serveur pour en exposer les potentiels bugs et vulnérabilités.
-\end{description}
+\subsection{OLinuXino A20}
 
-\subsubsection*{Format de script Nmap}
+\subsection{Uboot}
 
-Les scripts Nmap sont structurés de façon à contenir plusieurs champs descriptifs, des méthodes conditionnant l'exécution du script, et une méthode principale qui représente le coeur du script.
+charger sur la carte SD
 
-Ci-dessous la liste des champs descriptifs :
-\begin{description}
-\item[description :] contient une brève description des fonctionnalités du script.
-\item[categories :]  définit la ou les catégories auxquelles appartient le script.
-\item[author :] contient le nom des développeurs du script
-\item[licence :] détérminer la licence sous laquelle est le script.
-\item[dependencies :] Ensemble des dépendances ainsi les scripts mentionnés doivent etre executés avant le script en question.
-\end{description}
+envoi de binaire via kermit
 
-Les scripts Nmap possèdent une méthode assimilable au \textsf{main} en C, appellée \textsf{action}. Les scripts Nmap utilisent des règles pour déterminer s'il faut exécuter le script sur une cible ou non. Ces règles sont des fonctions booléennes. La fonction \textsf{action} n'est executée que si les règles sont vraies. Il en existe quatre différentes :
-
-\begin{description}
-\item [prerule() :] lancée une fois avant toute action du script, doit retourner vrai.
-\item [hostrule(host) :] lancée avant chaque scan d'hôte. Permet de savoir s'il est atteignable ou non
-\item [portrule(host,port) :] de même que hostrule, mais permet de savoir si les ports d'un hôte donné sont atteignables.
-\item [postrule() :] lancée une fois après toute action du script, doit retourner vrai
-\end{description}
-
-L'appel de scripts Nmap créés se fait via la commande \textsf{Nmap --script HelloWorld.nse} (pour un script \textsf{HelloWorld.nse}). Pour nous familiriariser avec le Lua et le NSE, un script HelloWorld a été créé, permettant d'illustrer la structure d'un script Nmap, dont voici le contenu :
-\begin{verbatim}
-local nmap = require "nmap" 
-local table = require "table" 
-
-description = [[Script Hello World]] 
-author = "Arnauld Duforat,Louis Lévèque,
-          Mathias Brulatout,Kamal Mallouky" 
-license = "GPL 2.0" 
-categories = {"default,safe"} 
-
-prerule = function()
-  return true
-end
-
-postrule = function() 
-  return true 
-end 
-
-action = function() 
-  local out = {} 
-  table.insert(out, string.format("Hello World"))
-  return stdnse.format_output(true, out)  
-end
-\end{verbatim}
-
-\subsection{Authentification par clés SSH}
-L'authentification par clés SSH se base sur la cryptographie asymétrique (ou à clé publique) qui repose sur l'utilisation d'une clé publique, diffusée, et d'une clé privée. La publique sert à chiffrer, et la privée sert à déchiffrer. Seul le véritable destinaire, détenteur de la clé privée est donc capable de comprendre le message envoyé, même s'il n'est pas le seul à le recevoir.
-
-SSH met en place ce mécanise via la commande \textsf{ssh-keygen} générant une clé privée (\textsf{$\sim$/.ssh/id\_rsa}) et une clé publique (\textsf{$\sim$/.ssh/id\_rsa.pub}). Il suffit de placer la clé publique sur la machine distante (dans \textsf{$\sim$/.ssh/authorized\_keys}) pour permettre lui permettre d'être reconnue auprès de la machine locale.
-
-Cette authentification est une alternative à l'authentification par mot de passe, pour des raisons de sécurité, et de confort. A chaque session SSH, il n'est pas nécessaire de rentrer son mot de passe, sur une machine potentiellement vulnérable, non mise à jour, d'où le mot de passe pourrait fuir. En contrepartie, il faut limiter les droits du fichier \textsf{$\sim$/.ssh/id\_rsa} contenant la clé privée, en veillant à ne donner aucun droit aux autres utilisateurs, puisque la sécurité de ce système repose sur la non-divulgation de cette clé.
-
-Avec un grand nombre de clés publique, il est intéressant de toutes les essayer sur des machines différentes. Une d'elle pourrait nous identifier et des droits non-légitimes seraient donc acquis, ouvrant la voie à de potentielles attaques et exploitations de failles.
+{\Huge \textbf{FINIR SUR HELLOWORLD EXECUTE}}
 
 \clearpage
 \section{R\'ealisation}
-Cette partie pr\'esente notre d\'emarche de cr\'eation du script Nmap et les diff\'erents probl\`emes rencontr\'es.
-
-Dans un premier temps nous nous sommes pench\'es sur le code des scripts Nmap relatifs à SSH. Malheureusement nous avons constat\'e que les fonctions d'utilisation du protocole SSH n\'ecessaires aux scripts existants \'etaient r\'eimpl\'ement\'ees en Lua dans le code de Nmap.
-
-Puisque les fonctions d'authentification par clefs publiques n'\'etait pas disponibles, nous avons choisi d'employer la biblioth\`eque C \textsf{libssh2} plutôt que de rentrer dans la complexit\'e du protocole SSH.
-
-Nos recherches se sont alors concentr\'ees sur les techniques permettant d'appeler des fonctions d'une biblioth\`eque C depuis du code Lua. Apr\`es avoir essay\'e de comprendre comment utiliser le g\'en\'erateur de Wrapper SWIG ou \textsf{Simplified Wrapper and Interface Generator} nous nous sommes rendus compte qu'il n'\'etait pas possible d'appeler des fonctions d'une biblioth\`eque C externe directement depuis du Lua. Nous avons donc d\'ecid\'e d'utiliser les primitives de la biblioth\`eque C Lua pour "pousser" les fonctionnalit\'es de la Biblioth\`eque \textsf{libssh2} dans la machine virtuelle Lua.
-
-Pour cela il nous a \'et\'e n\'ecessaire d'\'ecrire des fonctions d'encapsulation capable d'extraire les arguments d'un \'etat Lua. Ces fonctions doivent être int\'egr\'es à Nmap.
-
-La \textsf{libssh2} n'\'etait pas import\'ee par Nmap. En effet, historiquement cette biblioth\`eque n'\'etait pas thread-safe, ce qui a pouss\'e les d\'eveloppeurs Nmap à r\'eimpl\'ementer ses fonctions. Mais le probl\`eme a depuis \'et\'e r\'esolu (en juin 2009). Nous avons donc d\'ecid\'e d'ajouter une d\'ependance sur \textsf{libssh2} à Nmap.
-
-Puisque Nmap utilise \textsf{autoconf}(dont le processus d'exécution est illustré Figure 1) pour v\'erifier la pr\'esence de ses d\'ependances, nous avons dû nous familiariser avec son fonctionnement et sa syntaxe.
-
-Un fichier de script nomm\'e \textsf{configure.ac} d\'ecrit dans un langage compris par \textsf{autoconf} les proc\'edures de v\'erification n\'ecessaires à la bonne construction du logiciel. À partir de ce fichier et du fichier \textsf{Makefile.in} sera g\'en\'er\'e le script \textsf{configure} qui est capable de v\'erifier la pr\'esence des diff\'erentes d\'ependances et de g\'en\'erer un \textsf{Makefile} adapt\'e au syst\`eme et à l'architecture cible.
-Les modifications qu'il nous a fallu apporter à ces deux fichiers sont les suivantes :
+Cette partie présente les diverses fonctionnalités de notre projet.
+\subsection{UART}
+Une fois que nous avons réussi à compiler et exécuter notre propre programme sur la carte, il a fallu développer ce qui allait être la base de l'interface de notre système, la communication série.
+Pour cela il nous faut utiliser un UART (Universal Asynchronous Receiver Transmitter), composant dédié à ce type de communication.
+Puisque l'UART0 est doté d'un brochage séparé et que c'est celui utilisé par la console U-Boot, nous avons décidé de l'utiliser nous aussi.
+En cherchant dans le manuel d'utilisation du processeur A20, nous avons rapidement trouvé les informations nécessaires à l'utilisation du premier UART intégré :
 \begin{itemize}
-    \item ajouter la v\'erification de la pr\'esence de la biblioth\`eque \textsf{libssh2}. Pour cela nous nous sommes inspir\'es de la v\'erification de openssl. La macro \textsf{m4 AC\_CHECK\_LIB} v\'erifie la pr\'esence d'une biblioth\`eque pass\'ee en param\`etre en essayant de compiler un code appelant la fonction, elle aussi pass\'ee en param\`etre, de la biblioth\`eque.
-    \item ajouter le flag d'\'editeur de lien lors de la compilation. Cela se fait par l'interm\'ediaire du fichier \textsf{Makefile.in}.
+\item L'adresse de base de l'UART à partir de laquelle sont placés tous ses registres.
+\item La liste des registres de contrôle et de données de l'UART.
 \end{itemize}
+Après avoir réussi à envoyer un octet en assignant une valeur au registre DAT, nous avons écrit trois fonctions permettant d'initialiser la communication, d'envoyer et de recevoir un caractère.
 
-\begin{figure}[H]
-  \center
-  \includegraphics[width=10cm]{autoconf.png}
-  \caption{Processus d'exécution d'autoconf (wikipédia)}
-  \label{autoconf}
-\end{figure}
+Le fichier \textsf{uart.h} contient les différentes adresses de l'UART nécessairesà l'usage que l'on en fait, à savoir la simulation d'un terminal (lecture/écriture de caractères).
 
-Une fois la d\'ependance à \textsf{libssh2} ajout\'ee, nous avons impl\'ement\'e les fonctions à ajouter à la machine virtuelle Lua. Elles se trouvent dans nse\_main.cc contenant la fonction principale de la biblioth\`eque nse de Nmap.
-Ces m\'ethodes doivent respecter un prototype particulier pour pouvoir être ajout\'ees à la machine virtuelle Lua. Elles doivent prendre en param\`etre un pointeur de lua\_State et retourner un entier. La structure \textsf{lua\_State} contient une pile des param\`etres pass\'e à la fonction Lua. En haut de la pile se trouve le nombre des arguments (accessible grâce à \textsf{lua\_gettop}). Les arguments peuvent être r\'ecup\'er\'es avec lua\_tostring. Pour retourner une valeur de la fonction C++, nous avons besoin lua\_pushnumber.
+\begin{lstlisting}
+ /*UART0 address*/
+#define UART0 0x01C28000
+/*UART0's FIFO Control Register Offset*/
+#define FCR (1 << 1)
+/*UART0's Line Status Register offset*/
+#define LSR 5
+/*Data Ready Bit : First bit in LSR*/
+#define DR 0x1
+/*TX Holding Register Empty Bit : Sixth bit in LSR*/
+#define THRE (1 << 5)
+\end{lstlisting}
+\vspace*{-0.8cm}
 
-Une probl\`ematique du d\'eveloppement est qu'il n'est pas possible de passer une structure C++ à la machine virtuelle Lua. On ne pouvait manipuler en arguments et en valeur de retour que des entiers, des flottants et des chaines de caract\`eres. De plus, les macros ne peuvent pas être ajout\'ees à la machine virtuelle. Ainsi, il \'etait impossible d'ajouter les m\'ethodes de la \textsf{libssh2} à la machine virtuelle Lua directement. Nous avons donc dû encapsuler les op\'erations n\'ecessaires à une connection ssh dans deux m\'ethodes :
-\begin{itemize}
-    \item \textsf{session\_init}, responsable d'initialiser \textsf{libssh2}, de cr\'eer un socket, d'initialiser une session SSH, et de faire le handshake SSH.
-    \item \textsf{userauth\_publickey}, qui teste de s'authentifier avec une cl\'e publique d'un utilisateur donn\'e
-\end{itemize}
-Ces m\'ethodes sont utilis\'ees dans un script Nmap en Lua que nous avons ajout\'e dans la biblioth\`eque de scripts NSE : \textsf{ssh2-key-acceptance-checker.nse}. 
-La premi\`ere m\'ethode fonctionne. La deuxi\`eme m\'ethode retourne syst\`ematiquement une erreur \textsf{LIBSSH2\_ERROR\_PUBLICKEY\_UNVERIFIED} (-19) et n\'ecessiterait que nous modifions la \textsf{libssh2} pour ajouter des codes de debug et ainsi trouver d'où vient l'erreur.
+Le registre FCR (FIFO Control Register) nous permet de désactiver la gestion de file, pour nous faciliter la tâche.
+L'idée est ensuite de manipuler le registre LSR (Line Status Register) et son bit DR (Data Ready) pour récupérer un caractère lorsque ce bit est égal à 1. Cela nous permet de simuler une fonction \textsf{getc}.
+
+ Le bit THRE (Tx Holding Register Empty) du même registre est à 1 lorsque le mode FIFO est désactivé et lorsqu'un caractère est prêt à être reçu. Il ne reste plus qu'à écrire le caractère reçu pour simuler un \textsf{putc}.
+
+En se basant sur la fonction d'envoi, nous avons pour plus de commodité créer une fonction destinée à envoyer une chaîne de caractères.
+
+L'étape suivante à été naturellement de réaliser l'interface console à proprement dite. Une fonction est chargée d'afficher le prompt, une autre qui doit être appelée à intervalles réguliers, s'occupe de recevoir les frappes clavier et de renvoyer les caractères reçus afin de fournir un retour à l'utilisateur. Cette même fonction stocke les caractères dans un buffer, et appelle la fonction d'exécution de commande si l'utilisateur a pressé la touche Entrée.
+
+
+%\lstinputlisting[caption=Scheduler, style=customc]{../uart.c}
+\subsection{GPIO}
+
+\subsection{Memory Management}
+
+\clearpage
+\section{Problèmes rencontrés}
+uboot
+GPIO... ?
+MMU/Power Management ?
+
+Incompétence
 
 \clearpage
 \section*{Conclusion}
 
+Développement le plus bas niveau qu'on ait jamais fait. Sans uboot, ça aurait été du baremetal
+Utilisation du C sans bibliothèque externe
+Utilisation d'UART / GPIO inconnus avant
+Implémentation de malloc/free
+on est des autiste : (int*) + 1 = int* + sizeof(int)
 
+
+{\Large\textbf{OLDCONCLUSION}}
 Bien que nous n'ayons pas réussi à faire fonctionner notre script, ce projet a été l'occasion de découvrir diverses technologies. En effet, les scripts Nmap étant développés en Lua nous avons été amenés a nous familiariser avec ce langage de scripts. De plus, puisque notre projet nécessitait d'ajouter à Nmap une dépendance sur la bibliothèque \textsf{libssh2}, il nous a fallu apprendre à utiliser un des outils du système de compilation GNU, \textsf{autoconf}. 
 
 Ce qui a sans doute coûté sa réussite à ce projet sont les problèmes rencontrés tout au long de ce dernier. L'avancement s'est fait par petites étapes débouchant chaque fois sur un nouveau problème dont la résolution nous prenait parfois plusieurs jours. Cependant le sujet et sa problématique étaient plutôt intéressants.
 
-En effet, l'utilisation de clés SSH sur différentes machines automatiquement possède un réel intérêt. En effet, en 2012, une faille a été découverte affectant un grand nombre de matériel BigIP\footnote{https://www.trustmatta.com/advisories/MATTA-2012-002.txt}. Ils contiennent une clé privée autorisant l'accès SSH root à quiconque sur n'importe quel autre matériel BigIP, et la clé publique est disponible.
 \end{document}
