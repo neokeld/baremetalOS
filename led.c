@@ -65,15 +65,17 @@ char led_dat_get_state(void)
     return led_dat_value;
 }
 
-int led_func(const char * arg, int nb_args)
+int led_func(const char * args[], int nb_args)
 {
 	int arg_value;
 	led_cfg_set(1);
 	if(nb_args == 0)
+	{
 	    led_dat_set(!led_dat_get_state());
+	}
 	else if (nb_args == 1)
 	{
-	    arg_value = atoi(arg);
+	    arg_value = atoi(args[0]);
 	    if(arg_value == 1 || arg_value == 0)
 		led_dat_set(arg_value);
 	    else

@@ -39,4 +39,10 @@ void gpio_activate(int pin);
 /*Change the pin state to 0V*/
 void gpio_desactivate(int pin);
 int gpio_read(void);
+/*Parsing function for the gpio command
+ * Return :
+ * 0: Ok
+ * -1: Error*/
+int gpio_func(const char * args[], int nb_args);
+
 #endif
