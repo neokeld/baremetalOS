@@ -167,9 +167,10 @@ L'étape suivante à été naturellement de réaliser l'interface console à pro
 Les GPIO (General Purpose Input Output) sont des modules d'entrées sorties permettant d'interfacer le SoC à toutes sortes d'éléments, notamment des LEDs ou des boutons.
 L'OLinuXino dispose de 3 connecteurs GPIO. Nous avons choisi d'utiliser le GPIO0. Du point de vue du contrôleur, 10 ports peuvent être utilisés pour remplir diverses fonctions telles que des bus de communications SPI, CAN, TWI et UART. Il est également possible d'utiliser certains ports comme source d'interruption. Dans ce projet on considère uniquement leur fonction GPIO.
 Chaque port dispose de jusqu'à 4 registres de configuration permettant de choisir pour chaque broche du port si elle doit être utilisé comme entrée, sortie ou pour une fonction avancée.
-La configuration d'une broche se fait sur 3 bits mais ces configuration sont alignées sur 4 bits dans le registre qui concerne donc uniquement 8 broches. La combinaison \so{\textsf{001}} correspond à une sortie alors que \so{\textsf{000}} correspond à une entrée.
+La configuration d'une broche se fait sur 3 bits mais ces configurations sont alignées sur 4 bits dans le registre qui concerne donc uniquement 8 broches. La combinaison \so{\textsf{001}} correspond à une sortie alors que \so{\textsf{000}} correspond à une entrée.
 Une fois que les broches sont configurées, on peut lire ou écrire le registre DAT du port où chaque bit correspond à une broche.
 La LED intégrée à la carte est elle même raccordée à un GPIO ce qui permet de la contrôler de manière logicielle.
+Pour les contrôler, nous avons créé deux commandes. La première est led, qui sans paramètre change l'état de la LED1. Elle peut aussi accepter un entier (0 ou 1) pour allumer ou éteindre la LED. En cas de mauvaise utilisation, nous affichons un usage. La deuxième est gpio, qui sans paramètre active la pin 9 du GPIO-2. Elle active la pin voulue en lui passant en paramètre le numéro de cette pin.
 \section{Memory Management}
 
 \clearpage
