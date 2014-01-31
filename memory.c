@@ -1,34 +1,125 @@
 #include "memory.h"
-#define MEMSTART 0x7AAAAAAA
+#define MEMSTART 0x70000000
+#define MEMEND 0x40000000
 
-struct memblock *firstfree = NULL;
-volatile void *freebase = MEMSTART;
+struct memblock *firstfree;
+void *freebase = (void *)MEMSTART-4;
+
+void malloc_init(void){
+  firstfree = NULL;
+}
+
 
 void *malloc(size_t size){
-  void* ret;
+  void* addr;
+  size_t tmpsize;
+  struct memblock* tmpblck;
+
+  console_print("\r\nEntering malloc\r\n");
+  console_print("firstfree = ");
+  console_print_hexa(firstfree);
+  console_print("\r\n");
+
 
   if(firstfree == NULL){
-
-    console_print("freebase = ");
-    console_print_hexa(freebase);
-
-    console_print("\r\n");
-
-    ret = freebase;
-    freebase -= size;
-    console_print("ret = ");
-    console_print_hexa(ret);
-    console_print("\r\n");
-    console_print("\r\n");
-
-    return ret;
+    addr = freebase;
+    *(((int *)addr)+1) = size;
+    freebase -= (size + 4);
+    return addr;
   }
-    
-}
-    
-  /*if(size < firstfree->size){
-    firstfree->size=*/
+  
+  tmpblck = firstfree;
+  addr = tmpblck->addr;
+  console_print("addr = ");
+  console_print_hexa(addr);
+  console_print("\r\n");
 
+  tmpsize = *(((int *)addr)+1);
+  console_print("tmpsize = ");
+  console_print_hexa(tmpsize);
+  console_print("\r\n");
+  console_print("size = ");
+  console_print_hexa(size);
+  console_print("\r\n");
+  console_print("tmpblck->next = ");
+  console_print_hexa(tmpblck->next);
+  console_print("\r\n");
+    
+  if(tmpsize >= size){
+    console_print("Made it!!!\r\n");
+    if(tmpblck->next != NULL)
+      tmpblck->next->prev = tmpblck->prev;
+    *(((int *)addr)+1)=size;
+    console_print("*(((int *)addr)+1) = ");
+    console_print_hexa(*(((int *)addr)+1));
+    console_print("\r\n");
+
+    return addr;
+  }
+  while(tmpblck!=NULL ){
+    tmpblck = tmpblck->next;
+    addr = tmpblck->addr;
+    tmpsize = *(((int *)addr)+1);
+    if(tmpsize >= size){
+      tmpblck->prev->next = tmpblck->next;
+      if(tmpblck->next != NULL)
+	tmpblck->next->prev = tmpblck->prev;
+      *(((int *)addr)+1)=size;
+      return addr;
+    }
+  }
+  if(freebase >=(void *)  MEMEND + (size + 4)){
+    addr = freebase;
+    *(((int *)addr)-1) = size;
+    freebase -= (size + 4);
+    return addr;
+  } 
+  return NULL;
+}
+
+void free(void* ptr){
+  size_t size = *(((int *)ptr)+1);
+  struct memblock* newblck;
+  struct memblock* tmpblck;
+  struct memblock blck;
+
+  /*console_print("\r\nEntering free\r\n");
+
+  console_print("freebase = ");
+  console_print_hexa(freebase);
+  console_print("\r\n");
+
+  console_print("ptr - size = ");
+  console_print_hexa(ptr - size);
+  console_print("\r\n");
+  */
+  if((ptr - size) == freebase){
+    freebase += size;
+  }
+  else if(firstfree == NULL){
+    blck.addr = ptr;
+    blck.prev = NULL;
+    blck.next = NULL;
+    firstfree = &blck;
+  }
+  else{
+    newblck = firstfree;
+    do{
+      tmpblck = newblck;
+      newblck = newblck->next;
+    }while(newblck != NULL);
+    /*TODO : Merge si blocs consécutifs*/
+    tmpblck->next = newblck;
+    blck.prev = tmpblck;
+    blck.addr = ptr;
+    blck.next = NULL;
+    newblck = &blck;
+  }
+  
+}
+
+    
+  
 
 
 /*int memprobe(void){
@@ -75,15 +166,15 @@ void *malloc(size_t size){
     
 
 
-void memtest(){
+/*void memtest(){
   volatile unsigned int* mem;
 
-  /*REGISTRES
+  REGISTRES
   console_print("ETAT DES REGISTRES\r\n");
   console_print_registers();
   console_print("\r\n");
-  */
-  //Vérifie les zones mémoires accesibles
+  
+//Vérifie les zones mémoires accesibles
   console_print(">mem = MEMSTART;\r\n");
   mem = MEMSTART;
   
@@ -154,3 +245,4 @@ void memtest(){
   console_print_registers();
 }
 
+*/
