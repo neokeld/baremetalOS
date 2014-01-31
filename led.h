@@ -38,6 +38,6 @@ char led_dat_get_state(void);
  * Return :
  * 0: Ok
  * -1: Error*/
-int led_func(const char * arg, int nb_args);
+int led_func(const char * args[], int nb_args);
 
 #endif
