@@ -98,12 +98,48 @@ Tout d'abord, l'A20 sera presenté, afin d'enchaîner sur le travail et les choi
 \section{Présentation de la plateforme}
 
 \subsection{OLinuXino A20}
+ L'Olinuxino est un nano-ordinateur, il s'agit d'une carte mère distribuée en matériel libre basé sur un un système sur 
+ puce,il s'agit d'un système embarqué sur une seule puce ARM, cette unique puce intègre un mircoprocesseur dual core, 
+ le mémoire vive, une mémoire flash, un connecteur micro SD plus les différent connecteurs de périphériques tel que des 
+ ports USB, connecteur SATA ..., la puce intégre aussi 3 connecteurs GPIO regroupant un ensemble de 160 gpio's, 
+ et un connecteur UART sur les quels nos travaux était focalisés.
+
+ l'équiement était doté dans le départ avec un système Android stocké dans la mémoire flash de l'équipement, 
+ or faire un projet système sur un système Android n'était pas chose évidente, nous avions pensé au départ de mettre 
+ un SE Linux sur une carte SD et le faire tourner sur l'Olinuxino pour faire des développements la dessus, 
+ mais notre curiosité nous a poussé plus loin encore et de rentrer en communication direct avec certaines composantes 
+ du matériel, pour cela nous avions décidé de developpé un pseudo OS en C qui permettra de lire et écrire sur les 
+ sorties/entrées GPIO de la carte , et qui permettra aussi de lire et écrire sur le port série utilisant les UART.
+
+	Dans un premier temps nous avions cherché à monter un Système d'exploitation minimale codé en C sur l'équipement, 
+ la première solution qui nous est arrivé à l'esprit est d'utiliser le Uboot.
 
 \subsection{Uboot}
 
-charger sur la carte SD
+Uboot pour Universal Bootloader,  un chargeur de démarrage écrit en C permettant d'amorcer un Système d'exploitation 
+sur un équipement particulier, Uboot fonctionne sur plusieurs architectures, il est en général executé lors de la mise 
+sous tension de l'équipement dans le but d'initialiser les périphériques.Uboot démarre en général à partir d'une ROM, 
+et peut utiliser un cache de données ou  une puce du processeur comme mémoire vive.
 
-envoi de binaire via kermit
+  Après avoir télécharger Uboot, la version téléchargée ne marchait pas, alors il nous a fallu revenir à une version 
+ultérieure, le but était, après la compilation du bootloader, le mettre sur une carte SD afin de pouvoir envoyer et 
+lancer le binaire de notre OS,  nous avions utilisé alors une carte Micro SD  où  deux partitions ont été crées, 
+la première formaté en vfat qui est le format attendu par le bootloader  et la deuxième en ext2 si on veut mettre 
+des binaires dessus :
+
+	mkfs. vfat  /dev/sdb1
+	mkfs. ext2 /dev/sdb2
+ 
+ après il ne restait plus qu'écrire le U-boot sur la micro SD, le U-boot est écris sur /dev/sdb et non /dev/sdb1 
+(je ne sais pas toujours pourquoi : veuillez expliquer):
+
+    dd if=u-boot-sunxi/u-boot-sunxi-with-spl.bin of=/dev/sdb bs=1024 seek=8 sync
+  dans une autre étape, nous compilons le code de notre OS en utilisant la commande make, avant d'envoyer le binaire 
+sur l'olimex reliée par un port-USB série utilisant le protocole de transfert de fichiers kermit,utilsant la commande 
+ckermit du coté de l'ordinateur et loadb du coté de l'Olimex, un script a été fait pour ce but qui adopte les bonnes 
+options pour ckermit.
+Donc après l'envoi du binaire de l'OS sur une adresse bien spécifique au niveau de l'Olimex, il ne reste plus qu'à se 
+positionner sur l'adresse en question et executer le fichier.
 
 {\Huge \textbf{FINIR SUR HELLOWORLD EXECUTE}}
 

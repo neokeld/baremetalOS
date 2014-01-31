@@ -1,5 +1,7 @@
 #include "led.h"
 #include "console.h"
+#include "utils.h"
+
 volatile unsigned int * led;
 volatile unsigned int * led_cfg0;
 volatile unsigned int * led_dat;
@@ -61,4 +63,29 @@ char led_cfg_get_state(void)
 char led_dat_get_state(void)
 {
     return led_dat_value;
+}
+
+int led_func(const char * arg, int nb_args)
+{
+	int arg_value;
+	led_cfg_set(1);
+	if(nb_args == 0)
+	    led_dat_set(!led_dat_get_state());
+	else if (nb_args == 1)
+	{
+	    arg_value = atoi(arg);
+	    if(arg_value == 1 || arg_value == 0)
+		led_dat_set(arg_value);
+	    else
+	    {
+		console_print("Bad argument : Not 0 or 1.\r\n");
+		return -1;
+	    }
+	}
+	else
+	{
+	    console_print("Bad number of arguments\r\n");
+	    return -1;
+	}
+        return 0;
 }
