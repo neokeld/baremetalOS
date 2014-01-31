@@ -6,15 +6,15 @@
 #define MAX_NB_ARGS 16
 
 struct arg {
-    char * name;
+  char * name;
 };
 
 struct cmd {
-    char * name;
-    char * desc;
-    int nb_arg;
-    struct arg args[MAX_ARGS];
-    int (*func)(const char * args[], int nb_args);
+  char * name;
+  char * desc;
+  int nb_arg;
+  struct arg args[MAX_ARGS];
+  int (*func)(const char * arg, int nb_args);
 };
 
 int atoi(const char * str);
