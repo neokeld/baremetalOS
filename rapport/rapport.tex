@@ -15,7 +15,7 @@
 \usepackage{xcolor}
 
 \definecolor{mygreen}{rgb}{0,0.6,0}
-\definecolor{mygray}{rgb}{0.5,0.5,0.5}
+\definecolor{mygray}{rgb}{0.3,0.3,0.3}
 \definecolor{mymauve}{rgb}{0.58,0,0.82}
 
 \lstset{ %
@@ -35,13 +35,13 @@
   morekeywords={*,...},            % if you want to add more keywords to the set
   numbers=left,                    % where to put line number (none, left, right)
   numbersep=5pt,                   % how far the line-numbers are from the code
-  numberstyle=\tiny\color{mygray}, % the style that is used for the line-numbers
+  numberstyle=\footnotesize\color{mygray}, % line number style
   rulecolor=\color{white},         % black for rules
   showspaces=false,                % show spaces, overrides 'showstringspaces'
   showstringspaces=false,          % underline spaces within strings only
   showtabs=false,                  % show tabs 
   stepnumber=1,                    % the step between two line-numbers.
-  stringstyle=\color{mymauve},     % string literal style
+    stringstyle=\color{mymauve},     % string literal style
   tabsize=2,                       % sets default tabsize to 2 spaces
   title=\lstname                   % filename \lstinputlisting; try caption
 }
@@ -109,8 +109,6 @@ envoi de binaire via kermit
 
 \clearpage
 \section{UART}
-
-{\Large\textbf{Phrase intro}}
 Une fois que nous avons réussi à compiler et exécuter notre propre programme sur la carte, il a fallu développer ce qui allait être la base de l'interface de notre système, la communication série.
 Pour cela il nous faut utiliser un UART (Universal Asynchronous Receiver Transmitter), composant dédié à ce type de communication.
 Puisque l'UART0 est doté d'un brochage séparé et que c'est celui utilisé par la console U-Boot, nous avons décidé de l'utiliser nous aussi.
@@ -145,7 +143,6 @@ L'idée est ensuite de manipuler le registre LSR (Line Status Register) et son b
 En se basant sur la fonction d'envoi, nous avons pour plus de commodité créer une fonction destinée à envoyer une chaîne de caractères.
 
 L'étape suivante à été naturellement de réaliser l'interface console à proprement dite. Une fonction est chargée d'afficher le prompt, une autre qui doit être appelée à intervalles réguliers, s'occupe de recevoir les frappes clavier et de renvoyer les caractères reçus afin de fournir un retour à l'utilisateur. Cette même fonction stocke les caractères dans un buffer, et appelle la fonction d'exécution de commande si l'utilisateur a pressé la touche Entrée.
-
 
 %\lstinputlisting[caption=Scheduler, style=customc]{../uart.c}
 \section{GPIO}
