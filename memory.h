@@ -15,5 +15,6 @@ struct memblock{
 void memtest(void);
 void *malloc(size_t size);
 void free(void *ptr);
+int reg_func(const char * args[], int nb_args);
 
 #endif
