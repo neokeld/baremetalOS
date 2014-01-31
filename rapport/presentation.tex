@@ -5,6 +5,59 @@
 \usepackage{multicol}
 
 \usetheme{Berlin}
+
+\usepackage{listings}
+\usepackage{xcolor}
+
+\definecolor{mygreen}{rgb}{0,0.6,0}
+\definecolor{mygray}{rgb}{0.3,0.3,0.3}
+\definecolor{mymauve}{rgb}{0.58,0,0.82}
+
+\lstset{ %
+  backgroundcolor=\color{white},   % cbackground color \usepackage{xcolor}
+  basicstyle=\footnotesize,        % font size
+  breakatwhitespace=false,         % autobreak only at whitespace
+  breaklines=true,                 % sets automatic line breaking
+  captionpos=b,                    % sets the caption-position to bottom
+  commentstyle=\color{mygreen},    % comment style
+  deletekeywords={...},            % delete keywords from the given language
+  escapeinside={\%*}{*)},          % if you want to add LaTeX within your code
+  extendedchars=true,              % lets you use non-ASCII characters; no UTF8
+  frame=single,                    % adds a frame around the code
+  keepspaces=true,                 % keeps spaces, to indent : columns=flexible
+  keywordstyle=\color{blue},       % keyword style
+  language=Octave,                 % the language of the code
+  morekeywords={*,...},            % if you want to add more keywords to the set
+  numbers=left,                    % where to put line number (none, left, right)
+  numbersep=5pt,                   % how far the line-numbers are from the code
+  numberstyle=\footnotesize\color{mygray}, % line number style
+  rulecolor=\color{white},         % black for rules
+  showspaces=false,                % show spaces, overrides 'showstringspaces'
+  showstringspaces=false,          % underline spaces within strings only
+  showtabs=false,                  % show tabs 
+  stepnumber=1,                    % the step between two line-numbers.
+  stringstyle=\color{mymauve},     % string literal style
+  tabsize=2,                       % sets default tabsize to 2 spaces
+  title=\lstname                   % filename \lstinputlisting; try caption
+}
+
+\lstdefinestyle{customc}{
+  belowcaptionskip=1\baselineskip,
+  breaklines=true,
+  frame=L,
+  xleftmargin=\parindent,
+  language=C,
+  showstringspaces=false,
+  basicstyle=\normalsize\ttfamily,
+  keywordstyle=\bfseries \color{green!40!black},
+  commentstyle=\itshape \color{purple!40!black}, %itshape
+  identifierstyle=\color{blue},
+  stringstyle=\color{orange},
+}
+\lstset{escapechar=@,style=customc}
+
+
+
 \defbeamertemplate*{headline}{}
 {
   \begin{beamercolorbox}[ht=2.25ex,dp=3ex,center]{section in head/foot}
@@ -48,11 +101,6 @@
 \addtocounter{framenumber}{-1}
 
 
-
-\begin{frame}
-  \frametitle{Introduction}
-\end{frame}
-
 \AtBeginSection[]
 {
   \begin{frame}
@@ -70,13 +118,63 @@
 \subsection{}
 \begin{frame}
   \frametitle{OLinuXino A20}
+  \begin{itemize}
+  \item Micro-ordinateur
+  \item System on Chip (SoC)
+  \item Système Android installé
+  \item divers composants
+    \begin{itemize}
+      \item USB/HDMI/Eth...
+      \item 8 UARTs
+      \item 3GPIOs = 160pins
+    \end{itemize}
+  \end{itemize}
 \end{frame}
 
 
 \begin{frame}
   \frametitle{Uboot}
+  \begin{itemize}
+  \item Chargeur de démarrage open-source
+  \item Plusieurs architectures
+  \item Initialise les périphériques
+  \item Charge l'OS
+  \end{itemize}
 \end{frame}
 
+\section{Architecture}
+\subsection{ }
+
+\begin{frame}
+
+\end{frame}
+
+\begin{frame}
+\frametitle{Architecture}
+\begin{itemize}
+\item baremetal\_os.c
+\item uart.c
+\item console.c
+\item gpio.c
+\item led.c
+\item memory.c
+\item command.c
+\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]
+\frametitle{Structure cmd}
+\begin{lstlisting}
+struct cmd {
+  char * name;
+  char * desc;
+  int nb_arg;
+  struct arg args[MAX_ARGS];
+  //Function to call
+  int (*func)(const char * arg, int nb_args);
+};
+\end{lstlisting}
+\end{frame}
 
 \section{UART}
 \subsection{}
@@ -87,18 +185,21 @@
     \item Contrôle
     \item Status
     \item Data
-  \end{itemize}
-  \textsf{getc} \& \textsf{putc} \\
+  \end{itemize}~\\
+  \textsf{getc} \& \textsf{putc} \\~\\
   Emulation d'un terminal
 \end{frame}
 
 \begin{frame}
 \frametitle{Commandes possibles}
-\begin{itemize}
-  \item
-  \item
-  \item
-\end{itemize}
+  \textsf{led} \\
+  \textsf{gpio pin\_number} \\
+  \textsf{reg} \\
+    \begin{itemize}
+    \item Stack Pointer
+    \item Link Register
+    \item Proc Counter
+    \end{itemize}
 \end{frame}
 
 %\begin{frame}
@@ -135,6 +236,9 @@
 
 \begin{frame}
   \frametitle{Conclusion}
+Régression U-boot
+Utilisation des UARTs et GPIOs réussie
+malloc/free implémentés
 \end{frame}
 
 \end{document}
