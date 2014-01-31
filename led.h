@@ -34,4 +34,10 @@ char led_cfg_get_state(void);
  * 0: 0 V*/
 char led_dat_get_state(void);
 
+/*Parsing function for the led command
+ * Return :
+ * 0: Ok
+ * -1: Error*/
+int led_func(const char * arg, int nb_args);
+
 #endif

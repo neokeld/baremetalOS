@@ -15,7 +15,7 @@
 \usepackage{xcolor}
 
 \definecolor{mygreen}{rgb}{0,0.6,0}
-\definecolor{mygray}{rgb}{0.5,0.5,0.5}
+\definecolor{mygray}{rgb}{0.3,0.3,0.3}
 \definecolor{mymauve}{rgb}{0.58,0,0.82}
 
 \lstset{ %
@@ -35,13 +35,13 @@
   morekeywords={*,...},            % if you want to add more keywords to the set
   numbers=left,                    % where to put line number (none, left, right)
   numbersep=5pt,                   % how far the line-numbers are from the code
-  numberstyle=\tiny\color{mygray}, % the style that is used for the line-numbers
+  numberstyle=\footnotesize\color{mygray}, % line number style
   rulecolor=\color{white},         % black for rules
   showspaces=false,                % show spaces, overrides 'showstringspaces'
   showstringspaces=false,          % underline spaces within strings only
   showtabs=false,                  % show tabs 
   stepnumber=1,                    % the step between two line-numbers.
-  stringstyle=\color{mymauve},     % string literal style
+    stringstyle=\color{mymauve},     % string literal style
   tabsize=2,                       % sets default tabsize to 2 spaces
   title=\lstname                   % filename \lstinputlisting; try caption
 }
@@ -98,20 +98,35 @@ Tout d'abord, l'A20 sera presenté, afin d'enchaîner sur le travail et les choi
 \section{Présentation de la plateforme}
 
 \subsection{OLinuXino A20}
+L'Olinuxino est un nano-ordinateur, composé d'une carte mère distribuée en matériel libre basé sur un système sur puce. Il s'agit d'un système embarqué sur une seule puce ARM. Cette unique puce intègre un mircoprocesseur dual core, de la mémoire vive, une mémoire flash, un connecteur micro SD et différents connecteurs tels que des ports USB etc. La puce intégre aussi 3 connecteurs GPIO regroupant un ensemble de 160 pins controlables, et une connection série sur laquelle nos travaux ont été focalisés.
 
-\subsection{Uboot}
+L'A20 était doté dès le départ d'un système Android stocké sur la mémoire flash de l'équipement. Cependant, faire un projet de développement système sur un système Android n'était pas d'un grand intérêt, ni même installer un système UNIX sur une carte SD et le faire tourner sur l'Olinuxino pour faire du développement. Notre curiosité nous a poussé plus loin et nous avions décidé de developper un pseudo OS en C qui permettra de communiquer sur le port série via l'utilisation d'un UART et de manipuler les GPIO de la carte.
 
-charger sur la carte SD
+Plutôt que de développer un OS baremetal et de passer plus de temps à faire fonctionner les divers périphériques plutôt que de les utiliser, nous avons choisi d'utiliser Uboot, chargeur de démarrage nous permettant d'envoyer un binaire pouvant utiliser les différents périphériques sur la carte et de l'exécuter.
+ 
+\subsection{U-boot}
 
-envoi de binaire via kermit
+Uboot (Universal Bootloader) est un chargeur de démarrage écrit en C permettant d'amorcer un Système d'exploitation sur un équipement particulier et fonctionne sur plusieurs architectures. Il est en général exécuté lors de la mise sous tension de l'équipement dans le but d'initialiser les périphériques. Uboot démarre à partir d'une ROM, et peut utiliser un cache de données ou une puce du processeur comme mémoire vive.
 
-{\Huge \textbf{FINIR SUR HELLOWORLD EXECUTE}}
+Après avoir récupéré et compilé les sources les plus récentes de U-boot via le git approprié à notre plateforme, il nous a fallu répeter de nombreuses fois la même manipulation avant de se rendre compte que la version la plus récente de U-boot ne marchait pas. Il nous a donc fallu revenir à une version antérieure.
+Pour mettre U-boot sur une carte Micro SD, deux partitions ont été crées : la première formatée en vfat qui est le format attendu par le bootloader et la deuxième en ext2 si on veut mettre des binaires dessus :
 
-\clearpage
+\begin{itemize}
+  \item \textsf{mkfs.vfat /dev/sdb1}
+  \item \textsf{mkfs.ext2 /dev/sdb2}
+ \end{itemize}
+
+Il ne restait plus qu'à écrire grâce à un dd sur /dev/sdb, U-boot avec un SPL (Secondary Program Loader), qui se appelé par le bootloader et qui chargera U-boot :
+
+\begin{verbatim}
+dd if=u-boot-sunxi/u-boot-sunxi-with-spl.bin of=/dev/sdb bs=1024 seek=8
+\end{verbatim}
+
+Après compilation du code sans l'inclusion de la moindre bibliothèque externe et avec un grand nombre d'options via la commande \textsf{arm-linux-gnueabihf-gcc}, il suffit d'envoyer le binaire généré sur l'Olimex relié par un port USB série en utilisant la commande ckermit du coté client et loadb du coté Olimex.
+Après l'envoi du binaire de l'OS sur une adresse bien spécifique au niveau de l'Olimex, il ne reste plus qu'à se positionner sur l'adresse en question et exécuter le binaire.
+
 \section{UART}
-
-{\Large\textbf{Phrase intro}}
-Une fois que nous avons réussi à compiler et exécuter notre propre programme sur la carte, il a fallu développer ce qui allait être la base de l'interface de notre système, la communication série.
+Une fois que nous avons réussi à compiler et exécuter notre propre programme sur la carte, il a fallu développer ce qui allait être la base de l'interface de notre système : la communication série.
 Pour cela il nous faut utiliser un UART (Universal Asynchronous Receiver Transmitter), composant dédié à ce type de communication.
 Puisque l'UART0 est doté d'un brochage séparé et que c'est celui utilisé par la console U-Boot, nous avons décidé de l'utiliser nous aussi.
 En cherchant dans le manuel d'utilisation du processeur A20, nous avons rapidement trouvé les informations nécessaires à l'utilisation du premier UART intégré :
@@ -145,7 +160,6 @@ L'idée est ensuite de manipuler le registre LSR (Line Status Register) et son b
 En se basant sur la fonction d'envoi, nous avons pour plus de commodité créer une fonction destinée à envoyer une chaîne de caractères.
 
 L'étape suivante à été naturellement de réaliser l'interface console à proprement dite. Une fonction est chargée d'afficher le prompt, une autre qui doit être appelée à intervalles réguliers, s'occupe de recevoir les frappes clavier et de renvoyer les caractères reçus afin de fournir un retour à l'utilisateur. Cette même fonction stocke les caractères dans un buffer, et appelle la fonction d'exécution de commande si l'utilisateur a pressé la touche Entrée.
-
 
 %\lstinputlisting[caption=Scheduler, style=customc]{../uart.c}
 \section{GPIO}

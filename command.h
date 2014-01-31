@@ -14,6 +14,7 @@ struct cmd {
     char * desc;
     int nb_arg;
     struct arg args[MAX_ARGS];
+    int (*func)(const char * arg, int nb_args);
 };
 
 int atoi(const char * str);
