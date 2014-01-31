@@ -225,7 +225,37 @@ struct cmd {
 \section{Memory Management}
 \subsection{ }
 \begin{frame}
-  \frametitle{}
+  \frametitle{Detection de la mémoire}
+  \begin{itemize}
+  \item Manual Probing
+  \item Doc Reading
+  \end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]
+  \frametitle{Affichage de l'état des registres}
+\begin{lstlisting}  
+unsigned int spReg, lrReg, pcReg;    
+asm volatile ("mov %0, sp" :"=r" (spReg));   
+asm volatile ("mov %0, lr" :"=r" (lrReg));
+asm volatile ("mov %0, pc" :"=r" (pcReg));
+\end{lstlisting}
+\end{frame}
+
+\begin{frame}
+  \frametitle{Gestionnaire de mémoire}
+  \begin{itemize}
+  \item Taille du bloc écrite au début
+  \item Pointeur vers la fin de la zone allouée
+  \item Liste chainée des blocs libres avant ce pointeur
+  \end{itemize}
+\end{frame}
+
+\begin{frame}
+  \frametitle{Structure d'un bloc}
+  \begin{itemize}
+\includegraphics[width=8cm]{memblock.png}
+  \end{itemize}
 \end{frame}
 
 \let\origaddtocontents=\addtocontents
