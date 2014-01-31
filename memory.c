@@ -120,15 +120,7 @@ void free(void* ptr){
 
 int reg_func(const char * args[], int nb_args)
 {
-	if(nb_args == 0)
-	{
-	    console_print_registers();
-	}
-	else
-	{
-	    console_print("Bad number of arguments\r\n");
-	    return -1;
-	}
+	console_print_registers();
         return 0;
 }   
   
