@@ -146,7 +146,20 @@
 \subsection{ }
 
 \begin{frame}
-
+\frametitle{Architecture}
+\begin{itemize}
+\item Modulaire
+    \begin{itemize}
+	\item Communication série
+	\item Interface console
+	\item Commandes
+	\item Gestion périphériques
+    \end{itemize}
+\item Extensible
+    \begin{itemize}
+	\item Possibilité d'ajouter de nouvelles commandes
+    \end{itemize}
+\end{itemize}
 \end{frame}
 
 \begin{frame}
@@ -202,19 +215,6 @@ struct cmd {
     \end{itemize}
 \end{frame}
 
-%\begin{frame}
-%\frametitle{Autoconf}
-%\begin{figure}
-%\includegraphics[width=4.4cm]{acschema.png}
-%\caption{Processus d'exécution d'autoconf}
-%\end{figure}
-%\end{frame}
-
-
-\begin{frame}
-\frametitle{ }
-\end{frame}
-
 \section{GPIO}
 \subsection{ }
 
@@ -266,9 +266,9 @@ asm volatile ("mov %0, pc" :"=r" (pcReg));
 
 \begin{frame}
   \frametitle{Conclusion}
-Régression U-boot
-Utilisation des UARTs et GPIOs réussie
-malloc/free implémentés
+  Régression U-boot \\~\\
+  Utilisation des UARTs et GPIOs réussie \\~\\
+  malloc/free implémentés \\~\\
 \end{frame}
 
 \end{document}
