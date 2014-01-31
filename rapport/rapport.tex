@@ -203,19 +203,9 @@ Nos mallocs et free fonctionnent et permettent d'allouer des blocs de mémoire d
 
 \section*{Conclusion}
 
-\noindent Ce projet a été l'occasion de programmer plus bas niveau que nous ne l'avons jamais fait. Nous avons pu utiliser le C sans bibliothèque, et utiliser les UARTs et GPIO qui nous été inconnus avant ce projet.
-De nombreux problèmes ont été rencontrés tout au long du projet
-
-Développement le plus bas niveau qu'on ait jamais fait. Sans uboot, ça aurait été du baremetal\\
-Utilisation du C sans bibliothèque externe\\
-Utilisation d'UART / GPIO inconnus avant\\
-Implémentation de malloc/free\\
-on est des autistes : (int*) + 1 = int* + sizeof(int)\\
-
-
-{\Large\textbf{OLDCONCLUSION}}
-Bien que nous n'ayons pas réussi à faire fonctionner notre script, ce projet a été l'occasion de découvrir diverses technologies. En effet, les scripts Nmap étant développés en Lua nous avons été amenés a nous familiariser avec ce langage de scripts. De plus, puisque notre projet nécessitait d'ajouter à Nmap une dépendance sur la bibliothèque \textsf{libssh2}, il nous a fallu apprendre à utiliser un des outils du système de compilation GNU, \textsf{autoconf}. 
-
-Ce qui a sans doute coûté sa réussite à ce projet sont les problèmes rencontrés tout au long de ce dernier. L'avancement s'est fait par petites étapes débouchant chaque fois sur un nouveau problème dont la résolution nous prenait parfois plusieurs jours. Cependant le sujet et sa problématique étaient plutôt intéressants.
+\noindent Ce projet a été l'occasion de programmer à un niveau plus bas que nous ne l'avons jamais fait. Nous avons pu utiliser le C sans bibliothèque, et utiliser les UARTs et GPIO qui nous étaient inconnus avant ce projet.
+De nombreux problèmes ont été rencontrés tout au long du projet, dont la regression constatée sur la dernière version de U-boot et notre manque de pratique du C bas niveau. 
+Nous avons aussi réussi à implémenter un module de gestion mémoire via malloc et free.
+Cependant, il y a encore de nombreuses étapes à parcourir pour obtenir un vrai système d'exploitation, notamment la gestion de la MMC, l'implémentation d'un système de fichiers ou l'exécution de programmes. Nous n'avons jamais perdu de vue ces fonctionnalités ce qui nous a aidé à écrire un code modulaire et maléable.
 
 \end{document}
