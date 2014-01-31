@@ -36,33 +36,20 @@ int baremetal_os (int argc, char * const argv[])
 
 	console_print("\r\n");
 
+
 	led_init();
 
-	/*console_print_hexa((char) *gpio); 	console_print("--");
 
-	console_print_hexa((char) *gpio_cfg0); console_print("--");
-	console_print_hexa((char) *gpio_cfg1); console_print("--");
-	console_print_hexa((char) *gpio_dat); console_print("--");
-
-	console_print("\r\n");
-*/
-	
 	gpio_init();
-/*
-	console_print_hexa((char) *gpio); console_print("--");
-	console_print_hexa((char) *gpio_cfg0); console_print("--");
-	console_print_hexa((char) *gpio_cfg1); console_print("--");
-	console_print_hexa((char) *gpio_dat); console_print("--");
 
-	console_print("\r\n");
-*/
-
-        gpio_output_set(9);
+	cmd_init();
+	
+        //gpio_output_set(9);
 
 /*gpio_output_set(11);
 	gpio_input_set(13);
 	gpio_input_set(15);*/
-        gpio_activate(9);
+        //gpio_activate(9);
 	/*gpio_activate(13);
 	gpio_activate(17);
 	gpio_activate(19);*/
