@@ -2,6 +2,7 @@
 #include "console.h"
 #include "command.h"
 
+
 static char buffer[128]; 
 static int pos;
 static enum mode_t {DEFAULT, HEXA, NB_MODES} mode;
@@ -95,24 +96,30 @@ void console_print_hexa(unsigned int c)
 }
 
 void console_print_registers(void){
-  //Affiche l'état des registres
 
-  register unsigned int R13 asm("sp");
-  register unsigned int R14 asm("lr");
-  register unsigned int R15 asm("pc");
+    unsigned int spReg, lrReg, pcReg;
 
+    asm volatile ("mov %0, sp" :
+                "=r" (spReg));
+    
+    asm volatile ("mov %0, lr" :
+                "=r" (lrReg));
 
+    asm volatile ("mov %0, pc" :
+                "=r" (pcReg));
+    
   console_print("r13 (sp) = ");
-  console_print_hexa("SP");
+  console_print_hexa(spReg);
   console_print("\r\n");
 
   console_print("r14 (lr) = ");
-  console_print_hexa("LR");
+  console_print_hexa(lrReg);
   console_print("\r\n");
   
   console_print("r15 (pc) = ");
-  console_print_hexa("PC");
+  console_print_hexa(pcReg);
   console_print("\r\n");
+   
 }
 
 
