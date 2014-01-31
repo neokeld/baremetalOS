@@ -171,6 +171,34 @@ La LED intégrée à la carte est elle même raccordée à un GPIO ce qui permet
 Pour les contrôler, nous avons créé deux commandes. La première est led, qui sans paramètre change l'état de la LED1. Elle peut aussi accepter un entier (0 ou 1) pour allumer ou éteindre la LED. En cas de mauvaise utilisation, nous affichons un usage. La deuxième est gpio, qui sans paramètre active la pin 9 du GPIO-2. Elle active la pin voulue en lui passant en paramètre le numéro de cette pin.
 \section{Memory Management}
 
+\subsection{Detection de la mémoire}
+Notre premier objectif était de pouvoir détecter la mémoire de manière automatique, indépendante du matériel. Par exemple, on voudrait pouvoir utiliser notre gestionnaire de mémoire quelle que soit la quantité de RAM disponnible.  Si sur architecture x86 il est possible d'interroger très simplement le BIOS pour obtenir les informations voulues, ça n'est pas le cas sur ARM. Des recherches nous orientent vers une méthode de \textit{manual probing}. Le principe est de tester sur l'ensemble de l'espace adressable, à intervalle régulier (ici tous les Mio), si une valeur peut-être écrite puis lue sans erreur. Pour éviter d'effacer des données importantes en mémoire (exemple : le code de notre fonction), on sauvegarde dans une variable la valeur qui était présente à cette adresse avant notre test. On cherche ensuite à détecter la plus longue séquence possible sans erreurs, et on considère qu'il s'agit de la RAM. Cette méthode n'est bien sûr pas parfaite. En effet, on ne prend pas en compte des effets non voulus, tels que l'écriture dans des caches, ou une \textit{persistance} des bus qui ferait qu'une valeur écrite puis lue directement après serait en fait un résidu présent dans le bus. Il faut aussi, évidemment, s'assurer que le compilateur ne fera pas d'optimisation. \\ \\
+En testant cette méthode, puis en comparant les résultats avec des valeurs connues (1G de RAM, débutant à l'adresse 0x40000000), on tombe sur des résultats \textit{presque cohérents}. La zone détectée est beaucoup plus grande que la zone mémoire réelle. En comparant avec la documentation du processeur, on comprend qu'on écrit à certaines adresses en dehors de celles dédiées à la mémoire. De plus, notre test détecte que tout l'espace d'adressage dédié à la mémoire est utilisé, comme si nous avions en réalité 4G de RAM. Nous avons effectué une petite expérience supplémentaire pour comprendre ce phénomène:\\
+Nous écrivons à des adresses 0x400000XX, puis lisons aux adresses 0x800000XX (soit aux valeurs \textit{adresse+1G}). A chaque fois, la valeur lue est égale à celle écrite. Cela s'explique par le fait qu'en l'absence de mémoire, l'adressage est répété, et plusieurs adresses vont pointer sur le meme espace physique.\\ \\
+La détection de mémoire automatique n'est donc pas efficace dans notre cas, ou du moins n'avons nous pas eu le temps d'approfondir suffisemment pour obtenir quelque chose d'exploitable. Pour la suite du développement, nous utilisons donc des valeurs trouvées dans la documentation ou detectées par expérimentation pour placer notre tas. Par exemple, il est possible d'afficher le contenu des registres en insérant du code assembleur dans notre C :
+\begin{lstlisting}
+
+    unsigned int spReg, lrReg, pcReg;
+
+    asm volatile ("mov %0, sp" :
+                "=r" (spReg));
+    
+    asm volatile ("mov %0, lr" :
+                "=r" (lrReg));
+
+    asm volatile ("mov %0, pc" :
+                "=r" (pcReg));
+\end{lstlisting}
+La fonction \textsf{asm volatile ("instruction \%0, \%1":"=r" (output):"r" (input))} permet d'indiquer à GCC que l'on souhaite placer l'instruction assembleur \textit{instruction \%0, \%1} dans notre code, et que l'on souhaite utiliser que l'entrée soit lue dans la variable C input, et la sortie écrite dans la variable output. Ainsi, on repère l'emplacement mémoire où se situe le code gràce à pc et lr, et celui où se situe la stack avec pc. On voit donc qu'au lancement le code est placé au début de la RAM, et la stack à la fin. Nous plaçons donc notre tas \textit{au milieu} (Notre système étant monoprocess, nous n'avons qu'un seul tas).
+
+\subsection{Gestionnaire de mémoire}
+Une fois en possession d'une zone mémoire où nous pouvons écrire sans craindre d'affecter le reste du fonctionnement de la machine (\textit{le milieu}), reste à définir des fonctions permettant au reste de notre système d'y reserver et libérer de la mémoire. Nous appellerons arbitrairement ces fonctions \textit{malloc} et \textit{free}.\\
+Pour implémenter ces fonctions, nous devons faire un choix de représentation de notre mémoire. Nous choisissons de conserver un petit espace supplémentaire juste avant l'adresse retournée par malloc:\\
+\includegraphics[width=8cm]{memblock.png}\\
+Ainsi, free pourra savoir quelle quantité de mémoire libérer uniquement à partir du pointeur qui lui est passé. On maintient un pointeur vers le dernier espace alloué, \textsf{firstfree}. Malloc distingue deux cas avant d'agir : Soit la mémoire déjà allouée est continue, soit des blocs libres se trouvent en plein milieu. Dans le premier cas, il suffit simplement de recupérer la valeur de \textsf{firstfree} dans une variable (\textsf{addr}),d'ecrire la taille allouée à l'adresse \textsf{addr-sizeof(int)}, puis d'incrémenter \textsf{firstfree} de \textsf{taille + sizeof(int)}. Le second cas va dépendre du comportement que l'on choisit pour free.\\
+Pour free, nous maintenons une liste doublement chainée des blocs libres qui sont suivis d'au moins un bloc alloué. Si on essaie de libérer le dernier bloc du tas, free va simplement mettre à jour la valeur de \textsf{firstfree}. Dans le cas contraire, on rajoute simplement le bloc à la liste (par son adresse), de manière à ce que les blocs de la liste soient organisés par adresse croissante. Ainsi, lorsqu'un malloc futur sera fait, malloc va parcourir cette liste à la recherche d'un bloc libre dont la taille serait supérieure à la la taille que l'on souhaite allouer. \\\\
+Nos mallocs et free fonctionnent et permettent d'allouer des blocs de mémoire de taille quelconque, de les libérer dans n'importe quel ordre puis de réallouer dans les emplacements libres. Dans un avenir proche, nous avions prévu d'améliorer la libération en fusionnant deux blocs libre continus dans la liste chainée (D'où l'intéret de la liste doublement chainée). Notre fonction malloc retourne \textsf{NULL} quand la taille de notre tas risque d'empiéter sur les autres zones mémoire. 
+
 \clearpage
 
 \section*{Conclusion}
