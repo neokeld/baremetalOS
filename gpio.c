@@ -135,3 +135,33 @@ int gpio_read(void)
 {
     return *gpio_dat;    
 }
+
+int gpio_func(const char * args[], int nb_args)
+{
+	int arg_value;
+	if(nb_args == 0)
+	{
+	    gpio_output_set(9);
+	    gpio_activate(9);
+	}
+	else if (nb_args == 1)
+	{
+	    arg_value = atoi(args[0]);
+	    if(arg_value == 9 || arg_value == 11 || arg_value == 13 || arg_value == 15 || arg_value == 17 || arg_value == 19)
+	    {
+		gpio_output_set(arg_value);
+		gpio_activate(arg_value);
+	    }
+	    else
+	    {
+		console_print("Bad argument : Not a pin number.\r\n");
+		return -1;
+	    }
+	}
+	else
+	{
+	    console_print("Bad number of arguments\r\n");
+	    return -1;
+	}
+        return 0;
+}

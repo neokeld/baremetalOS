@@ -7,12 +7,14 @@
 typedef unsigned int size_t;
 
 struct memblock{
-  volatile void* addr;
-  size_t size;
+  void* addr;
+  struct memblock* prev;
   struct memblock* next;
 };
 
 void memtest(void);
 void *malloc(size_t size);
+void free(void *ptr);
+int reg_func(const char * args[], int nb_args);
 
 #endif
