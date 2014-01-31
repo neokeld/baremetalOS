@@ -8,7 +8,7 @@
 \usepackage{fancyvrb} 
 \usepackage{graphicx}
 \usepackage{hyperref}
-
+\usepackage{soul}
 \usepackage{listings}
 
 
@@ -132,6 +132,7 @@ Le fichier \textsf{uart.h} contient les différentes adresses de l'UART nécessa
 #define LSR 5
 /*Data Ready Bit : First bit in LSR*/
 #define DR 0x1
+
 /*TX Holding Register Empty Bit : Sixth bit in LSR*/
 #define THRE (1 << 5)
 \end{lstlisting}
@@ -149,7 +150,12 @@ L'étape suivante à été naturellement de réaliser l'interface console à pro
 
 %\lstinputlisting[caption=Scheduler, style=customc]{../uart.c}
 \section{GPIO}
-
+Les GPIO (General Purpose Input Output) sont des modules d'entrées sorties permettant d'interfacer le SoC à toutes sortes d'éléments, notamment des LEDs ou des boutons.
+L'OLinuXino dispose de 3 connecteurs GPIO. Nous avons choisi d'utiliser le GPIO0. Du point de vue du contrôleur, 10 ports peuvent être utilisés pour remplir diverses fonctions telles que des bus de communications SPI, CAN, TWI et UART. Il est également possible d'utiliser certains ports comme source d'interruption. Dans ce projet on considère uniquement leur fonction GPIO.
+Chaque port dispose de jusqu'à 4 registres de configuration permettant de choisir pour chaque broche du port si elle doit être utilisé comme entrée, sortie ou pour une fonction avancée.
+La configuration d'une broche se fait sur 3 bits mais ces configuration sont alignées sur 4 bits dans le registre qui concerne donc uniquement 8 broches. La combinaison \so{\textsf{001}} correspond à une sortie alors que \so{\textsf{000}} correspond à une entrée.
+Une fois que les broches sont configurées, on peut lire ou écrire le registre DAT du port où chaque bit correspond à une broche.
+La LED intégrée à la carte est elle même raccordée à un GPIO ce qui permet de la contrôler de manière logicielle.
 \section{Memory Management}
 
 \clearpage
@@ -160,7 +166,7 @@ L'étape suivante à été naturellement de réaliser l'interface console à pro
 Utilisation du C sans bibliothèque externe\\
 Utilisation d'UART / GPIO inconnus avant\\
 Implémentation de malloc/free\\
-on est des autiste : (int*) + 1 = int* + sizeof(int)\\
+on est des autistes : (int*) + 1 = int* + sizeof(int)\\
 
 
 {\Large\textbf{OLDCONCLUSION}}
