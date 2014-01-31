@@ -146,7 +146,20 @@
 \subsection{ }
 
 \begin{frame}
-
+\frametitle{Architecture}
+\begin{itemize}
+\item Modulaire
+    \begin{itemize}
+	\item Communication série
+	\item Interface console
+	\item Commandes
+	\item Gestion périphériques
+    \end{itemize}
+\item Extensible
+    \begin{itemize}
+	\item Possibilité d'ajouter de nouvelles commandes
+    \end{itemize}
+\end{itemize}
 \end{frame}
 
 \begin{frame}
@@ -202,21 +215,32 @@ struct cmd {
     \end{itemize}
 \end{frame}
 
-%\begin{frame}
-%\frametitle{Autoconf}
-%\begin{figure}
-%\includegraphics[width=4.4cm]{acschema.png}
-%\caption{Processus d'exécution d'autoconf}
-%\end{figure}
-%\end{frame}
-
+\section{GPIO}
+\subsection{ }
 
 \begin{frame}
 \frametitle{ }
 \end{frame}
 
-\section{GPIO}
+\section{Memory Management}
 \subsection{ }
+\begin{frame}
+  \frametitle{Detection de la mémoire}
+  \begin{itemize}
+  \item Manual Probing
+  \item Doc Reading
+  \end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]
+  \frametitle{Affichage de l'état des registres}
+\begin{lstlisting}  
+unsigned int spReg, lrReg, pcReg;    
+asm volatile ("mov %0, sp" :"=r" (spReg));   
+asm volatile ("mov %0, lr" :"=r" (lrReg));
+asm volatile ("mov %0, pc" :"=r" (pcReg));
+\end{lstlisting}
+\end{frame}
 
 \begin{frame}
 \frametitle{Accès aux GPIO}
@@ -231,13 +255,22 @@ struct cmd {
     \item activer une pin (3.3V)
     \item desactiver une pin (0V)
     \item lire l'état des pins
-  \end{itemize}~\\ 
+  \end{itemize}
+
+\begin{frame}
+  \frametitle{Gestionnaire de mémoire}
+  \begin{itemize}
+  \item Taille du bloc écrite au début
+  \item Pointeur vers la fin de la zone allouée
+  \item Liste chainée des blocs libres avant ce pointeur
+  \end{itemize}
 \end{frame}
 
-\section{Memory Management}
-\subsection{ }
 \begin{frame}
-  \frametitle{}
+  \frametitle{Structure d'un bloc}
+  \begin{itemize}
+\includegraphics[width=8cm]{memblock.png}
+  \end{itemize}
 \end{frame}
 
 \let\origaddtocontents=\addtocontents
@@ -248,9 +281,9 @@ struct cmd {
 
 \begin{frame}
   \frametitle{Conclusion}
-Régression U-boot
-Utilisation des UARTs et GPIOs réussie
-malloc/free implémentés
+  Régression U-boot \\~\\
+  Utilisation des UARTs et GPIOs réussie \\~\\
+  malloc/free implémentés \\~\\
 \end{frame}
 
 \end{document}
