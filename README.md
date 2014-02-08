@@ -1,11 +1,8 @@
 BaremetalOS - baremetal OS pour A20-olinuxino-micro
 
-Créé par
-Mathias Brulatout
-Arnaud Duforat
-Louis Lévèque
+Créé par : Mathias Brulatout, Arnaud Duforat, Louis Lévèque, Kamal Mallouky
 
-WTF License 2.0
+WTF License 2.0, 
 Do whatever the f*** you want with the content, EXCEPT claim it as your own work.
 
 
@@ -137,7 +134,18 @@ Une dernière méthode est d'utiliser :
 Quelques commandes de baremetalOS
 ---------------------------------
 
-led 0 : eteint la LED1
-led 1 : allume la LED1
-gpio X : active la pin X en sortie avec X={9,11,13,15,17,19}
-reg : affiche l'état des registres sp, lr et pc
+Eteindre la LED1 :
+
+    led 0
+
+Allumer la LED1 :
+
+    led 1
+
+Activer la pin X en sortie avec X={9,11,13,15,17,19} :
+
+    gpio X
+
+Afficher l'état des registres sp, lr et pc :
+
+    reg
