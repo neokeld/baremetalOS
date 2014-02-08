@@ -14,11 +14,12 @@ struct cmd {
   char * desc;
   int nb_arg;
   struct arg args[MAX_ARGS];
-  int (*func)(const char * arg, int nb_args);
+  int (*func)(const char * args[], int nb_args);
 };
 
-int atoi(const char * str);
+/*Initialize the command module*/
 void cmd_init(void);
+/*Parse and execute the command str*/
 void cmd_parse(char * str);
 
 #endif

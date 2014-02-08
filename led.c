@@ -19,9 +19,6 @@ void led_init(void)
 
 void led_cfg_set(char value)
 {
-    //console_print_hexa(*led_cfg0);
-    //console_print("\r\n");
-
     unsigned int tmp;
     tmp = *led_cfg0;
     if(value)
@@ -29,18 +26,11 @@ void led_cfg_set(char value)
     else
 	tmp &= ~(1 << PH2);
     *led_cfg0 = tmp;
-    /*console_print("led cfg set ");
-    console_print_hexa(*led_cfg0);
-    console_print(" \r\n");
-    console_print_hexa(tmp);*/
     led_cfg_value = value;
 }
 
 void led_dat_set(char value)
 {
-    //console_print_hexa(*led_dat);
-    //console_print("\r\n");
-
     unsigned int tmp;
     tmp = *led_dat;
     if(value)
@@ -48,10 +38,6 @@ void led_dat_set(char value)
     else
 	tmp &= ~(1 << PH2_DATA);
     *led_dat = tmp;
-    //console_print("led dat ");
-    //console_print_hexa(*led_dat);
-    //console_print(" \r\n");
-    //console_print_hexa(tmp);
     led_dat_value = value;
 }
 

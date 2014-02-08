@@ -133,3 +133,11 @@ Pour exécuter un fichier :
 Une dernière méthode est d'utiliser :
 
     sudo make send
+
+Quelques commandes de baremetalOS
+---------------------------------
+
+led 0 : eteint la LED1
+led 1 : allume la LED1
+gpio X : active la pin X en sortie avec X={9,11,13,15,17,19}
+reg : affiche l'état des registres sp, lr et pc
