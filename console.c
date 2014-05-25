@@ -1,7 +1,7 @@
 #include "uart.h"
 #include "console.h"
 #include "command.h"
-
+#include "utils.h"
 
 static char buffer[128]; 
 static int pos;
@@ -39,14 +39,14 @@ static void console_run(char * cmd)
 	switch (mode)
 	{
 	    case DEFAULT:
-		if(console_streq(cmd, "hexa"))
+		if(streq(cmd, "hexa"))
 		  mode = HEXA;
 		else {
 		    cmd_parse(cmd);
 		}
 		break;
 	    case HEXA:
-		if(console_streq(cmd, "exit"))
+		if(streq(cmd, "exit"))
 		    mode = DEFAULT;
 		else
 		{
@@ -118,17 +118,6 @@ void console_print_registers(void){
   
   console_print("r15 (pc) = ");
   console_print_hexa(pcReg);
-  console_print("\r\n");
-   
+  console_print("\r\n"); 
 }
 
-
-int console_streq(char * str, char* str2)
-{
-    while (*str && *str2)
-    {
-	if(*(str++) != *(str2++))
-	    return 0;	    
-    }
-    return *str == *str2;
-}

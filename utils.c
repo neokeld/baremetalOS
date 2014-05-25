@@ -12,3 +12,12 @@ int atoi(const char * str)
    return i;
 }
 
+int streq(const char * str, const char* str2)
+{
+    while (*str && *str2)
+    {
+	if(*(str++) != *(str2++))
+	    return 0;	    
+    }
+    return *str == *str2;
+}

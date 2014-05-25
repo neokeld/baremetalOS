@@ -38,6 +38,12 @@ void gpio_output_set(int pin);
 void gpio_activate(int pin);
 /*Change the pin state to 0V*/
 void gpio_desactivate(int pin);
+/*Read the pin state
+ * 1: activated
+ * 0: desactivated
+ * -1: Error: not a pin*/
+int gpio_is_activated(int pin);
+/*Read gpio dat*/
 int gpio_read(void);
 /*Parsing function for the gpio command
  * Return :

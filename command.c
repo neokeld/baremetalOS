@@ -3,6 +3,7 @@
 #include "led.h"
 #include "gpio.h"
 #include "memory.h"
+#include "utils.h"
 
 struct cmd led_cmd;
 struct cmd gpio_cmd;
@@ -74,19 +75,19 @@ void cmd_parse(char * str)
 	cmd_args[nb_args] = current_arg;
         nb_args++;
     }
-    if (console_streq(cmd_name, led_cmd.name))
+    if (streq(cmd_name, led_cmd.name))
     {
 	if(led_cmd.func(cmd_args, nb_args) == -1)
 	    cmd_print_usage(led_cmd);
 	console_prompt();
     }
-    else if (console_streq(cmd_name, gpio_cmd.name))
+    else if (streq(cmd_name, gpio_cmd.name))
     {
 	if(gpio_cmd.func(cmd_args, nb_args) == -1)
 	    cmd_print_usage(gpio_cmd);
 	console_prompt();
     }
-    else if (console_streq(cmd_name, reg_cmd.name))
+    else if (streq(cmd_name, reg_cmd.name))
     {
 	if(reg_cmd.func(cmd_args, nb_args) == -1)
 	    cmd_print_usage(reg_cmd);

@@ -1,5 +1,7 @@
 #include "gpio.h"
 #include "console.h"
+#include "utils.h"
+
 volatile unsigned int * gpio_cfg0;
 volatile unsigned int * gpio_cfg1;
 volatile unsigned int * gpio_dat;
@@ -119,6 +121,34 @@ void gpio_desactivate(int pin)
     }
 }
 
+int gpio_is_activated(int pin)
+{
+     switch(pin)
+    {
+	case 9:
+	    return (*gpio_dat >> 0) & 1;
+	    break;
+	case 11:
+	    return (*gpio_dat >> 1) & 1;
+	    break;
+	case 13:
+	    return (*gpio_dat >> 2) & 1;
+	    break;
+	case 15:
+	    return (*gpio_dat >> 3) & 1;
+	    break;
+	case 17:
+	    return (*gpio_dat >> 10) & 1;
+	    break;
+	case 19:
+	    return (*gpio_dat >> 11) & 1;
+	    break;
+	default:
+	    return -1;
+	    break;
+    } 
+}
+
 int gpio_read(void)
 {
     return *gpio_dat;    
@@ -137,8 +167,16 @@ int gpio_func(const char * args[], int nb_args)
 	    arg_value = atoi(args[0]);
 	    if(arg_value == 9 || arg_value == 11 || arg_value == 13 || arg_value == 15 || arg_value == 17 || arg_value == 19)
 	    {
-		gpio_output_set(arg_value);
-		gpio_activate(arg_value);
+		if(gpio_is_activated(arg_value))
+		{
+		    gpio_output_set(arg_value);
+		    gpio_desactivate(arg_value);
+		}
+		else
+		{
+		    gpio_output_set(arg_value);
+		    gpio_activate(arg_value);
+		}
 	    }
 	    else
 	    {

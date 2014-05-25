@@ -13,7 +13,5 @@ void console_prompt(void);
 void console_print_hexa(unsigned int c);
 /*Print registers state*/
 void console_print_registers(void);
-/*Returns 0 if str = str2, else 1*/
-int console_streq(char* str, char* str2);
 
 #endif

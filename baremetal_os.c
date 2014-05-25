@@ -15,6 +15,7 @@
 #include "console.h"
 #include "led.h"
 #include "memory.h"
+#include "command.h"
 
 /*Entry point*/
 int baremetal_os (int argc, char * const argv[])
