@@ -1,6 +1,6 @@
 BaremetalOS - baremetal OS pour A20-olinuxino-micro
 
-Créé par : Mathias Brulatout, Arnaud Duforat, Louis Lévèque, Kamal Mallouky
+Créé par : Mathias Brulatout, Arnaud Duforat <neokeld>, Louis Lévèque, Kamal Mallouky
 
 WTF License 2.0, 
 Do whatever the f*** you want with the content, EXCEPT claim it as your own work.
@@ -133,6 +133,9 @@ Une dernière méthode est d'utiliser :
 
 Quelques commandes de baremetalOS
 ---------------------------------
+
+Afficher l'aide :
+    help
 
 Eteindre la LED1 :
 
