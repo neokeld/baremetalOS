@@ -1,7 +1,7 @@
 /*
  * (C) Copyright 2013-2014
  * Mathias Brulatout
- * Arnaud Duforat
+ * Arnaud Duforat <neokeld>
  * Kamal Mallouky
  * Louis Lévèque
  * Nicolas Sarlin
@@ -20,24 +20,24 @@
 /*Entry point*/
 int baremetal_os (int argc, char * const argv[])
 {
-	uart_init();
-	console_print("\r\n");
-	console_init();
+    uart_init();
+    console_print("\r\n");
+    console_init();
 
-	console_print("\r\n");
+    console_print("\r\n");
 
-	led_init();
+    led_init();
 
-	cmd_init();
-	
-	console_print("\r\n");
+    cmd_init();
 
-      	console_prompt();
+    console_print("\r\n");
 
-	while(1)
-	{
-	    console_main();
-	}
+    console_prompt();
 
-	return 0;
+    while(1)
+    {
+	console_main();
+    }
+
+    return 0;
 }
