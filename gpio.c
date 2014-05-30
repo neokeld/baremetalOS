@@ -152,7 +152,7 @@ void gpio_activate_priv(const int gpio_pin_map[][2], const int pin)
 	*gpio_dat |= (1 << pio_number);
 }
 
-void gpio_desactivate_priv(const int gpio_pin_map[][2], const int pin)
+void gpio_deactivate_priv(const int gpio_pin_map[][2], const int pin)
 {
     int pio_number = gpio_pin_map[pin][1];
     if(gpio_init_priv(gpio_pin_map, pin) == 0)
@@ -189,12 +189,12 @@ void gpio_activate(const int gpio, const int pin)
     else if(gpio == 3)
 	gpio_activate_priv(gpio3_pin_map, pin);
 }
-void gpio_desactivate(const int gpio, const int pin)
+void gpio_deactivate(const int gpio, const int pin)
 {
     if(gpio == 2)
-	gpio_desactivate_priv(gpio2_pin_map, pin);
+	gpio_deactivate_priv(gpio2_pin_map, pin);
     else if(gpio == 3)
-	gpio_desactivate_priv(gpio3_pin_map, pin);
+	gpio_deactivate_priv(gpio3_pin_map, pin);
 }
 int gpio_is_activated(const int gpio, const int pin)
 {
@@ -227,7 +227,7 @@ int gpio_func(const char * args[], int nb_args)
 		if(gpio_is_activated(2, arg_value))
 		{
 		    gpio_output_set(2, arg_value);
-		    gpio_desactivate(2, arg_value);
+		    gpio_deactivate(2, arg_value);
 		}
 		else
 		{

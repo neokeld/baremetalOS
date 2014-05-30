@@ -26,8 +26,6 @@ int baremetal_os (int argc, char * const argv[])
 
     console_print("\r\n");
 
-    led_init();
-
     cmd_init();
 
     console_print("\r\n");

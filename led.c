@@ -1,44 +1,29 @@
 #include "led.h"
 #include "console.h"
 #include "utils.h"
+#include "gpio.h"
 
-volatile unsigned int * led;
-volatile unsigned int * led_cfg0;
-volatile unsigned int * led_dat;
+#define LED_GPIO 3
+#define LED_PIN 7
 
 char led_cfg_value;
-char led_dat_value;
-
-void led_init(void)
-{
-    led_cfg0 = (unsigned int *)(LED_CFG0);
-    led_dat = (unsigned int *)(LED_DAT);
-    led_cfg_value = 1;
-    led_dat_value = 1;
-}
 
 void led_cfg_set(char value)
 {
-    unsigned int tmp;
-    tmp = *led_cfg0;
     if(value)
-	tmp |= (1 << PH2);
+	gpio_output_set(LED_GPIO, LED_PIN);
     else
-	tmp &= ~(1 << PH2);
-    *led_cfg0 = tmp;
+	gpio_input_set(LED_GPIO, LED_PIN);
+
     led_cfg_value = value;
 }
 
 void led_dat_set(char value)
 {
-    unsigned int tmp;
-    tmp = *led_dat;
     if(value)
-	tmp |= (1 << PH2_DATA);
+	gpio_activate(LED_GPIO, LED_PIN);
     else
-	tmp &= ~(1 << PH2_DATA);
-    *led_dat = tmp;
-    led_dat_value = value;
+	gpio_deactivate(LED_GPIO, LED_PIN);
 }
 
 char led_cfg_get_state(void)
@@ -48,32 +33,32 @@ char led_cfg_get_state(void)
 
 char led_dat_get_state(void)
 {
-    return led_dat_value;
+    return gpio_is_activated(LED_GPIO, LED_PIN);
 }
 
 int led_func(const char * args[], int nb_args)
 {
-	int arg_value;
-	led_cfg_set(1);
-	if(nb_args == 0)
-	{
-	    led_dat_set(!led_dat_get_state());
-	}
-	else if (nb_args == 1)
-	{
-	    arg_value = atoi(args[0]);
-	    if(arg_value == 1 || arg_value == 0)
-		led_dat_set(arg_value);
-	    else
-	    {
-		console_print("Bad argument : Not 0 or 1.\r\n");
-		return -1;
-	    }
-	}
+    int arg_value;
+    led_cfg_set(1);
+    if(nb_args == 0)
+    {
+	led_dat_set(!led_dat_get_state());
+    }
+    else if (nb_args == 1)
+    {
+	arg_value = atoi(args[0]);
+	if(arg_value == 1 || arg_value == 0)
+	    led_dat_set(arg_value);
 	else
 	{
-	    console_print("Bad number of arguments\r\n");
+	    console_print("Bad argument : Not 0 or 1.\r\n");
 	    return -1;
 	}
-        return 0;
+    }
+    else
+    {
+	console_print("Bad number of arguments\r\n");
+	return -1;
+    }
+    return 0;
 }

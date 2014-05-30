@@ -9,10 +9,10 @@ void gpio_output_set(const int gpio, const int pin);
 /*Change the pin state to 3.3V*/
 void gpio_activate(const int gpio, const int pin);
 /*Change the pin state to 0V*/
-void gpio_desactivate(const int gpio, const int pin);
+void gpio_deactivate(const int gpio, const int pin);
 /*Read the pin state
  * 1: activated
- * 0: desactivated
+ * 0: deactivated
  * -1: Error: not a pin*/
 int gpio_is_activated(const int gpio, const int pin);
 /*Read gpio dat*/
