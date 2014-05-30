@@ -12,36 +12,36 @@ int gpio2_pin_map[GPIO2_PIN_MAP_SIZE][2] = {
 		      {-1,-1}, /* pin 0 : doesn't exist */
 		      {-1,-1}, /* pin 1 */
 		      {-1,-1},
-                      {-1,-1},
-                      {-1,-1},
 		      {-1,-1},
 		      {-1,-1},
 		      {-1,-1},
+		      {PE, 0},
 		      {-1,-1},
+		      {PE, 1},
 		      {PI, 0}, /* pin 9 */
-		      {-1,-1},
+		      {PE, 2},
 		      {PI, 1}, /* pin 11 */
-		      {-1,-1},
+		      {PE, 3},
 		      {PI, 2}, /* pin 13 */
-		      {-1,-1},
+		      {PE, 4},
 		      {PI, 3}, /* pin 15 */
-		      {-1,-1},
+		      {PE, 5},
 		      {PI,10}, /* pin 17 */
-		      {-1,-1},
+		      {PE, 6},
 		      {PI,11}, /* pin 19 */
-		      {-1,-1},
-		      {PC,3}, /* pin 21 */
-		      {-1,-1},
-		      {PC,7}, /* pin 23 */
-		      {-1,-1},
+		      {PE, 7},
+		      {PC, 3}, /* pin 21 */
+		      {PE, 8},
+		      {PC, 7}, /* pin 23 */
+		      {PE, 9},
 		      {PC,16}, /* pin 25 */
-		      {-1,-1},
+		      {PE,10},
 		      {PC,17}, /* pin 27 */
-		      {-1,-1},
+		      {PE,11},
 		      {PC,18}, /* pin 29 */
-		      {-1,-1},
+		      {PI,14},
 		      {PC,23}, /* pin 31 */
-		      {-1,-1},
+		      {PI,15},
 		      {PC,24}  /* pin 33 */
 		    };
 
@@ -118,7 +118,7 @@ int gpio_func(const char * args[], int nb_args)
 	else if (nb_args == 1)
 	{
 	    arg_value = atoi(args[0]);
-	    if(gpio2_pin_map[arg_value][0] != -1)
+	    if(arg_value > 0 && arg_value <= 40 && gpio2_pin_map[arg_value][0] != -1)
 	    {
 		if(gpio_is_activated(arg_value))
 		{
