@@ -1,34 +1,27 @@
 #ifndef _GPIO_H_
 #define _GPIO_H_
 
-/*GPIO address*/
-#define GPIO 0x01C20800
-/*Port I Configure Register 0 offset
- * Responsible of Port I0 to Port I7 - 120*/
-#define PI_CFG0 0x120
-#define GPIO_CFG0 (GPIO + PI_CFG0)
-/*Port I Configure Register 1 offset
- * Responsible of Port I8 to Port I15 - 124*/
-#define PI_CFG1 0x124
-#define GPIO_CFG1 (GPIO + PI_CFG1)
-/*Position of the first bit of PI0*/
-#define PI0 0
-/*Position of the first bit of PI1*/
-#define PI1 4
-/*Position of the first bit of PI2*/
-#define PI2 8
-/*Position of the first bit of PI3*/
-#define PI3 12
-/*Position of the first bit of PI10*/
-#define PI10 8
-/*Position of the first bit of PI11*/
-#define PI11 12
-/* Port I Data Register offset - 0x130*/
-#define PI_DAT 0x130
-#define GPIO_DAT (GPIO + PI_DAT)
+/*PIO module base address*/
+#define PIO 0x01C20800
+/*Port n Configure Register p*/
+#define P_CFG(n,p) (PIO + (n) * 0x24 + 0x04 *(p))
+/* Port n Data Register*/
+#define P_DAT(n) (PIO + (n) * 0x24 + 0x10)
 
-/*Initialize GPIO useful registers*/
-void gpio_init(void);
+#define PA 0
+#define PB 1
+#define PC 2
+#define PD 3
+#define PE 4
+#define PF 5
+#define PG 6
+#define PH 7
+#define PI 8
+
+/*Position of the first bit of PIO
+ * example of pio_number : in PA0, 0 is the pio_number*/
+#define PIO_FIRST_BIT(pio_number) (((pio_number) % 8)*4)
+
 /*Set a pin to act as an output
 * Can set the pin 9, 11, 13, 15, 17 and 19 of GPIO-2*/
 void gpio_input_set(int pin);

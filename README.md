@@ -135,6 +135,7 @@ Quelques commandes de baremetalOS
 ---------------------------------
 
 Afficher l'aide :
+
     help
 
 Eteindre la LED1 :

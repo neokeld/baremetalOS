@@ -28,8 +28,6 @@ int baremetal_os (int argc, char * const argv[])
 
 	led_init();
 
-	gpio_init();
-
 	cmd_init();
 	
 	console_print("\r\n");

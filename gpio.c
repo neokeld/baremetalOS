@@ -1,152 +1,105 @@
 #include "gpio.h"
 #include "console.h"
 #include "utils.h"
+#define GPIO2_PIN_MAP_SIZE 34
 
-volatile unsigned int * gpio_cfg0;
-volatile unsigned int * gpio_cfg1;
+volatile unsigned int * gpio_cfg;
 volatile unsigned int * gpio_dat;
 
-void gpio_init(void)
+int gpio_init(int);
+
+int gpio2_pin_map[GPIO2_PIN_MAP_SIZE][2] = {
+		      {-1,-1}, /* pin 0 : doesn't exist */
+		      {-1,-1}, /* pin 1 */
+		      {-1,-1},
+                      {-1,-1},
+                      {-1,-1},
+		      {-1,-1},
+		      {-1,-1},
+		      {-1,-1},
+		      {-1,-1},
+		      {PI, 0}, /* pin 9 */
+		      {-1,-1},
+		      {PI, 1}, /* pin 11 */
+		      {-1,-1},
+		      {PI, 2}, /* pin 13 */
+		      {-1,-1},
+		      {PI, 3}, /* pin 15 */
+		      {-1,-1},
+		      {PI,10}, /* pin 17 */
+		      {-1,-1},
+		      {PI,11}, /* pin 19 */
+		      {-1,-1},
+		      {PC,3}, /* pin 21 */
+		      {-1,-1},
+		      {PC,7}, /* pin 23 */
+		      {-1,-1},
+		      {PC,16}, /* pin 25 */
+		      {-1,-1},
+		      {PC,17}, /* pin 27 */
+		      {-1,-1},
+		      {PC,18}, /* pin 29 */
+		      {-1,-1},
+		      {PC,23}, /* pin 31 */
+		      {-1,-1},
+		      {PC,24}  /* pin 33 */
+		    };
+
+int gpio_init(int pin)
 {
-    gpio_cfg0 = (unsigned int *)(GPIO_CFG0);
-    gpio_cfg1 = (unsigned int *)(GPIO_CFG1);
-    gpio_dat = (unsigned int *)(GPIO_DAT);
+    if(pin >= GPIO2_PIN_MAP_SIZE) {
+	return -1;
+    }
+    else {
+	int pio_name = gpio2_pin_map[pin][0];
+	int pio_number = gpio2_pin_map[pin][1];
+	if (pio_name == -1) {
+	    return -2;
+	}
+	else {
+	    gpio_cfg = (unsigned int *)(P_CFG(pio_name, pio_number / 8));
+	    gpio_dat = (unsigned int *)(P_DAT(pio_name));
+	    return 0;
+	}
+    }
 }
 
 void gpio_output_set(int pin)
 {
-    switch(pin)
-    {
-	case 9:
-	    *gpio_cfg0 |= (1 << PI0);
-	    break;
-	case 11:
-	    *gpio_cfg0 |= (1 << PI1);
-	    break;
-	case 13:
-	    *gpio_cfg0 |= (1 << PI2);
-	    break;
-	case 15:
-	    *gpio_cfg0 |= (1 << PI3);
-	    break;
-	case 17:
-	    *gpio_cfg1 |= (1 << PI10);
-	    break;
-	case 19:
-	    *gpio_cfg1 |= (1 << PI11);
-	    break;
-	default:
-	    break;
-    }
+    int pio_number = gpio2_pin_map[pin][1];
+    if(gpio_init(pin) == 0)
+	*gpio_cfg |= (1 << PIO_FIRST_BIT(pio_number));
+	    
 }
 
 void gpio_input_set(int pin)
 {
-    switch(pin)
-    {
-	case 9:
-	    *gpio_cfg0 &= ~(1 << PI0);
-	    break;
-	case 11:
-	    *gpio_cfg0 &= ~(1 << PI1);
-	    break;
-	case 13:
-	    *gpio_cfg0 &= ~(1 << PI2);
-	    break;
-	case 15:
-	    *gpio_cfg0 &= ~(1 << PI3);
-	    break;
-	case 17:
-	    *gpio_cfg1 &= ~(1 << PI10);
-	    break;
-	case 19:
-	    *gpio_cfg1 &= ~(1 << PI11);
-	    break;
-	default:
-	    break;
-    }
+    int pio_number = gpio2_pin_map[pin][1];
+    if(gpio_init(pin) == 0)
+	*gpio_cfg &= ~(1 << PIO_FIRST_BIT(pio_number));
 }
 
 void gpio_activate(int pin)
 {
-    switch(pin)
-    {
-	case 9:
-	    *gpio_dat |= (1 << 0);
-	    break;
-	case 11:
-	    *gpio_dat |= (1 << 1);
-	    break;
-	case 13:
-	    *gpio_dat |= (1 << 2);
-	    break;
-	case 15:
-	    *gpio_dat |= (1 << 3);
-	    break;
-	case 17:
-	    *gpio_dat |= (1 << 10);
-	    break;
-	case 19:
-	    *gpio_dat |= (1 << 11);
-	    break;
-	default:
-	    break;
-    }
+    int pio_number = gpio2_pin_map[pin][1];
+    if(gpio_init(pin) == 0)
+	*gpio_dat |= (1 << pio_number);
 }
 
 void gpio_desactivate(int pin)
 {
-    switch(pin)
-    {
-	case 9:
-	    *gpio_dat &= ~(1 << 0);
-	    break;
-	case 11:
-	    *gpio_dat &= ~(1 << 1);
-	    break;
-	case 13:
-	    *gpio_dat &= ~(1 << 2);
-	    break;
-	case 15:
-	    *gpio_dat &= ~(1 << 3);
-	    break;
-	case 17:
-	    *gpio_dat &= ~(1 << 10);
-	    break;
-	case 19:
-	    *gpio_dat &= ~(1 << 11);
-	    break;
-	default:
-	    break;
-    }
+    int pio_number = gpio2_pin_map[pin][1];
+    if(gpio_init(pin) == 0)
+	*gpio_dat &= ~(1 << pio_number);
 }
 
 int gpio_is_activated(int pin)
 {
-     switch(pin)
-    {
-	case 9:
-	    return (*gpio_dat >> 0) & 1;
-	    break;
-	case 11:
-	    return (*gpio_dat >> 1) & 1;
-	    break;
-	case 13:
-	    return (*gpio_dat >> 2) & 1;
-	    break;
-	case 15:
-	    return (*gpio_dat >> 3) & 1;
-	    break;
-	case 17:
-	    return (*gpio_dat >> 10) & 1;
-	    break;
-	case 19:
-	    return (*gpio_dat >> 11) & 1;
-	    break;
-	default:
-	    return -1;
-	    break;
-    } 
+    int pio_number = gpio2_pin_map[pin][1];
+    if(gpio_init(pin) == 0)
+	return (*gpio_dat >> pio_number) & 1;
+    else
+	return -1;
 }
 
 int gpio_read(void)
@@ -165,7 +118,7 @@ int gpio_func(const char * args[], int nb_args)
 	else if (nb_args == 1)
 	{
 	    arg_value = atoi(args[0]);
-	    if(arg_value == 9 || arg_value == 11 || arg_value == 13 || arg_value == 15 || arg_value == 17 || arg_value == 19)
+	    if(gpio2_pin_map[arg_value][0] != -1)
 	    {
 		if(gpio_is_activated(arg_value))
 		{
