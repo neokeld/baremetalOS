@@ -138,6 +138,10 @@ Afficher l'aide :
 
     help
 
+Changer l'état de la LED1 :
+
+    led
+
 Eteindre la LED1 :
 
     led 0
@@ -146,9 +150,11 @@ Allumer la LED1 :
 
     led 1
 
-Activer la pin X en sortie avec X={9,11,13,15,17,19} :
+Activer la pin p en sortie du gpio n :
 
-    gpio X
+    gpio n p
+
+(relancer cette commande désactive la pin p)
 
 Afficher l'état des registres sp, lr et pc :
 

@@ -20,9 +20,10 @@ void cmd_init(void)
     led_cmd.func = led_func;
 
     gpio_cmd.name = "gpio";
-    gpio_cmd.desc = "Set/Unset the pin n on the GPIO-2.";
-    gpio_cmd.nb_arg = 1;
-    gpio_cmd.args[0].name = "Pin number";
+    gpio_cmd.desc = "Set/Unset the pin n on the GPIO-p.";
+    gpio_cmd.nb_arg = 2;
+    gpio_cmd.args[0].name = "Gpio number";
+    gpio_cmd.args[1].name = "Pin number";
     gpio_cmd.func = gpio_func;
 
     reg_cmd.name = "reg";
@@ -63,37 +64,43 @@ void cmd_parse(char * str)
     nb_args=0;
     const char * cmd_args[MAX_NB_ARGS];
     char * current_arg;
+    /*read command name*/
     while(*str && *str != ' ' && *str != '\0')
     {
 	cmd_name[name_len] = *str;
 	name_len++;
 	str++;
     }
-    *str = '\0';
-    cmd_name[name_len] = '\0';
-    str++;
-    while(*str == ' ')
-	str++;
+    /*if the command has args*/
     if(*str != '\0')
     {
-	current_arg = str;
-	while(*str)
+	*str = '\0';
+	cmd_name[name_len] = '\0';
+	str++;
+	while(*str == ' ')
+	    str++;
+	if(*str != '\0')
 	{
-	    if(*str == ' ')
+	    current_arg = str;
+	    while(*str)
 	    {
-		*str = '\0';
+		if(*str == ' ')
+		{
+		    *str = '\0';
+		    cmd_args[nb_args] = current_arg;
+		    nb_args++;
+		    str++;
+		    while(*str == ' ')
+			str++;
+		    current_arg = str;
+		}
+		str++;
+	    }
+	    if(*str != ' ')
+	    {
 		cmd_args[nb_args] = current_arg;
 		nb_args++;
-		while(*str == ' ')
-		    str++;
-		current_arg = str;
 	    }
-	    str++;
-	}
-	if(*str != ' ')
-	{
-	    cmd_args[nb_args] = current_arg;
-	    nb_args++;
 	}
     }
     /*TODO : use cmd_get_struct_cmd*/

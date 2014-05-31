@@ -1,7 +1,7 @@
 #ifndef _COMMAND_H_
 #define _COMMAND_H_
 
-#define MAX_ARGS 1
+#define MAX_ARGS 2
 #define MAX_LEN_NAME 16
 #define MAX_NB_ARGS 16
 
